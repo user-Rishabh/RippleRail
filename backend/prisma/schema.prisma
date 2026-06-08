@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  journeys  Journey[]
+  alerts    Alert[]
+}
+
+model Journey {
+  id           String       @id @default(uuid())
+  userId       String
+  trainNumber  String
+  source       String
+  destination  String
+  user         User         @relation(fields: [userId], references: [id])
+  connections  Connection[]
+}
+
+model Connection {
+  id               String   @id @default(uuid())
+  journeyId        String
+  connectingTrain  String
+  station          String
+  probabilityScore Float    // 0.0 to 100.0
+  journey          Journey  @relation(fields: [journeyId], references: [id])
+}
+
+model Alert {
+  id           String   @id @default(uuid())
+  userId       String
+  alertMessage String
+  severity     String   // SAFE, MODERATE, HIGH
+  user         User     @relation(fields: [userId], references: [id])
+}
