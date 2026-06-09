@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Calculator, ArrowRight, ShieldCheck, ShieldAlert, AlertTriangle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Calculator, ArrowRight, ShieldCheck, ShieldAlert, AlertTriangle, Link, Download, Share2 } from "lucide-react";
 
 interface RiskResult {
   catchProbability: number;
@@ -12,6 +12,12 @@ interface RiskResult {
 export default function RiskCalculator() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<RiskResult | null>(null);
+
+  // Toast state
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  // Shared prediction banner state
+  const [showSharedBanner, setShowSharedBanner] = useState(false);
 
   // Form state
   const [currentTrain, setCurrentTrain] = useState("");
@@ -72,21 +78,153 @@ export default function RiskCalculator() {
     return calculatedResult;
   };
 
-  const handleCalculate = (e: React.FormEvent) => {
-    e.preventDefault();
+  const runCalculation = (t1: string, bStn: string, t2: string, cStn: string) => {
     setLoading(true);
     
     // Simulate API call and calculation delay
     setTimeout(() => {
-      const computedResult = calculateConnectionRisk(
-        currentTrain,
-        boardingStation,
-        connectingTrain,
-        connectionStation
-      );
+      const computedResult = calculateConnectionRisk(t1, bStn, t2, cStn);
       setResult(computedResult);
       setLoading(false);
     }, 1200);
+  };
+
+  const handleCalculate = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    runCalculation(currentTrain, boardingStation, connectingTrain, connectionStation);
+  };
+
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  // Load shared prediction on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const t1 = params.get("t1");
+    const stn1 = params.get("stn1");
+    const t2 = params.get("t2");
+    const stn2 = params.get("stn2");
+
+    if (t1 && stn1 && t2 && stn2) {
+      setCurrentTrain(t1);
+      setBoardingStation(stn1);
+      setConnectingTrain(t2);
+      setConnectionStation(stn2);
+      setShowSharedBanner(true);
+      
+      const timer = setTimeout(() => {
+        runCalculation(t1, stn1, t2, stn2);
+      }, 500);
+
+      const bannerTimer = setTimeout(() => {
+        setShowSharedBanner(false);
+      }, 3000);
+
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(bannerTimer);
+      };
+    }
+  }, []);
+
+  const generateShareUrl = () => {
+    const origin = window.location.origin;
+    const path = window.location.pathname;
+    const params = new URLSearchParams();
+    params.set("t1", currentTrain);
+    params.set("stn1", boardingStation);
+    params.set("t2", connectingTrain);
+    params.set("stn2", connectionStation);
+    return `${origin}${path}?${params.toString()}`;
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      const url = generateShareUrl();
+      await navigator.clipboard.writeText(url);
+      showToast("Copied!", "success");
+    } catch (err) {
+      console.error("Failed to copy link:", err);
+      showToast("Failed to copy link", "error");
+    }
+  };
+
+  const handleDownloadTxt = () => {
+    if (!result) return;
+    const timestamp = new Date().toLocaleString();
+    const content = `=========================================
+RippleRail Connection Risk Assessment
+=========================================
+Generated on: ${timestamp}
+
+[TRIP INFORMATION]
+Current Train:      ${currentTrain}
+Boarding Station:   ${boardingStation}
+Connecting Train:   ${connectingTrain}
+Connection Station: ${connectionStation}
+
+[ASSESSMENT RESULTS]
+Risk Level:         ${result.riskLevel.toUpperCase()}
+Catch Probability:  ${result.catchProbability}%
+Expected Delay:     ${result.expectedDelay} minutes
+
+[RECOMMENDATION]
+${result.recommendation}
+
+=========================================
+Thank you for using RippleRail.
+Safe travels!
+=========================================`;
+
+    try {
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `RippleRail_Risk_Assessment_${currentTrain}_to_${connectingTrain}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast("Downloaded assessment summary", "success");
+    } catch (err) {
+      console.error("Failed to download file:", err);
+      showToast("Failed to download assessment summary", "error");
+    }
+  };
+
+  const handleShare = async () => {
+    const url = generateShareUrl();
+    const title = "RippleRail Connection Risk Assessment";
+    const text = `Check out this connection risk assessment for Train ${currentTrain} to Train ${connectingTrain} via RippleRail!`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          text,
+          url,
+        });
+        showToast("Shared successfully!", "success");
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          console.error("Error sharing:", err);
+          showToast("Failed to share", "error");
+        }
+      }
+    } else {
+      handleCopyLink();
+    }
   };
 
   // Helper for dynamic colors
@@ -111,6 +249,22 @@ export default function RiskCalculator() {
         <Calculator className="w-6 h-6 text-primary" />
         <h2 className="text-xl font-bold">Connection Risk Calculator</h2>
       </div>
+
+      <AnimatePresence>
+        {showSharedBanner && (
+          <motion.div
+            initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+            animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
+            exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-sm rounded-lg p-3 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 flex-shrink-0" />
+              <span>Shared prediction loaded</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <form onSubmit={handleCalculate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
@@ -241,8 +395,62 @@ export default function RiskCalculator() {
               </div>
             </div>
           </div>
+
+          {/* Share & Export action buttons row */}
+          <div className="flex flex-wrap items-center gap-3 mt-6 pt-4 border-t border-border/50">
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg border border-border bg-card hover:bg-secondary/80 hover:text-foreground text-muted-foreground transition-all duration-200 cursor-pointer shadow-sm hover:shadow"
+            >
+              <Link className="w-3.5 h-3.5" />
+              Copy Link
+            </button>
+            <button
+              type="button"
+              onClick={handleDownloadTxt}
+              className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg border border-border bg-card hover:bg-secondary/80 hover:text-foreground text-muted-foreground transition-all duration-200 cursor-pointer shadow-sm hover:shadow"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Download PDF
+            </button>
+            <button
+              type="button"
+              onClick={handleShare}
+              className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg border border-border bg-card hover:bg-secondary/80 hover:text-foreground text-muted-foreground transition-all duration-200 cursor-pointer shadow-sm hover:shadow"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              Share
+            </button>
+          </div>
         </motion.div>
       )}
+
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 text-sm font-semibold pointer-events-none"
+            style={{
+              backgroundColor: toast.type === "success" ? "rgba(16, 185, 129, 0.95)" : "rgba(239, 68, 68, 0.95)",
+              color: "#fff",
+              backdropFilter: "blur(4px)",
+              border: toast.type === "success" ? "1px solid rgba(16, 185, 129, 0.2)" : "1px solid rgba(239, 68, 68, 0.2)",
+            }}
+          >
+            {toast.type === "success" ? (
+              <ShieldCheck className="w-4 h-4 text-white" />
+            ) : (
+              <ShieldAlert className="w-4 h-4 text-white" />
+            )}
+            <span>{toast.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
