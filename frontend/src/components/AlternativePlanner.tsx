@@ -1,4 +1,5 @@
 import { Bus, Car, TrainFront, Clock, IndianRupee } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function AlternativePlanner() {
   const alternatives = [
@@ -38,18 +39,30 @@ export default function AlternativePlanner() {
   ];
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6">
+    <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
       <h2 className="text-xl font-bold mb-6">Smart Alternative Planner</h2>
       <div className="space-y-4">
-        {alternatives.map((alt) => (
-          <div key={alt.type} className={`p-4 rounded-lg border ${alt.border} bg-background/50 hover:bg-background transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4`}>
+        {alternatives.map((alt, index) => (
+          <motion.div 
+            key={alt.type} 
+            whileHover={{ y: -4, scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+            className={`p-4 rounded-lg border ${alt.border} bg-background/50 hover:bg-background transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm hover:shadow-md cursor-pointer`}
+          >
             <div className="flex items-center gap-4">
               <div className={`p-3 rounded-lg ${alt.bg}`}>
                 <alt.icon className={`w-6 h-6 ${alt.color}`} />
               </div>
               <div>
-                <h3 className="font-semibold">{alt.type} - {alt.name}</h3>
-                <p className="text-sm text-muted-foreground">{alt.recommendation}</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-semibold">{alt.type} - {alt.name}</h3>
+                  {index === 0 && (
+                    <span className="px-2 py-0.5 text-xs font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.2)] animate-pulse">
+                      Best Choice
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground mt-0.5">{alt.recommendation}</p>
               </div>
             </div>
             <div className="flex gap-6">
@@ -62,7 +75,7 @@ export default function AlternativePlanner() {
                 <span className="text-sm font-medium">{alt.cost}</span>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
