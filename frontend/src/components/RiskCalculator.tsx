@@ -177,8 +177,9 @@ export default function RiskCalculator() {
 
       {result && !loading && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 100, damping: 12, mass: 0.8 }}
           className="mt-8 p-5 bg-background border border-border rounded-lg shadow-inner"
         >
           <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
@@ -189,9 +190,42 @@ export default function RiskCalculator() {
           </div>
           
           <div className="grid grid-cols-2 gap-6 md:gap-4 md:grid-cols-4">
-            <div className="bg-secondary/30 p-3 rounded-lg border border-border/50">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Catch Probability</p>
-              <p className={`text-3xl font-bold ${getRiskColor(result.riskLevel)}`}>{result.catchProbability}%</p>
+            <div className="bg-secondary/30 p-3 rounded-lg border border-border/50 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Catch Probability</p>
+                <p className={`text-3xl font-bold ${getRiskColor(result.riskLevel)}`}>{result.catchProbability}%</p>
+              </div>
+              <div className="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle
+                    cx="24"
+                    cy="24"
+                    r="20"
+                    className="stroke-slate-200 dark:stroke-slate-800"
+                    strokeWidth="3.5"
+                    fill="transparent"
+                  />
+                  <motion.circle
+                    cx="24"
+                    cy="24"
+                    r="20"
+                    className={
+                      result.catchProbability > 70
+                        ? "stroke-emerald-500"
+                        : result.catchProbability >= 40
+                        ? "stroke-yellow-500"
+                        : "stroke-red-500"
+                    }
+                    strokeWidth="3.5"
+                    fill="transparent"
+                    strokeDasharray={2 * Math.PI * 20}
+                    initial={{ strokeDashoffset: 2 * Math.PI * 20 }}
+                    animate={{ strokeDashoffset: 2 * Math.PI * 20 - (result.catchProbability / 100) * (2 * Math.PI * 20) }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
             </div>
             <div className="bg-secondary/30 p-3 rounded-lg border border-border/50">
               <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Expected Delay</p>
