@@ -143,7 +143,7 @@ const initialEdges = [
     markerEnd: { type: MarkerType.ArrowClosed, color: '#10b981' },
     label: '+15 mins',
     labelStyle: { fill: '#34d399', fontWeight: 600, fontSize: 10 },
-    labelBgPadding: [6, 4],
+    labelBgPadding: [6, 4] as [number, number],
     labelBgBorderRadius: 4,
     labelBgStyle: { fill: '#0f172a', fillOpacity: 0.85 }
   },
@@ -156,7 +156,7 @@ const initialEdges = [
     markerEnd: { type: MarkerType.ArrowClosed, color: '#f59e0b' },
     label: '+30 mins',
     labelStyle: { fill: '#fbbf24', fontWeight: 600, fontSize: 10 },
-    labelBgPadding: [6, 4],
+    labelBgPadding: [6, 4] as [number, number],
     labelBgBorderRadius: 4,
     labelBgStyle: { fill: '#0f172a', fillOpacity: 0.85 }
   },
@@ -169,7 +169,7 @@ const initialEdges = [
     markerEnd: { type: MarkerType.ArrowClosed, color: '#ef4444' },
     label: '+30 mins',
     labelStyle: { fill: '#f87171', fontWeight: 600, fontSize: 10 },
-    labelBgPadding: [6, 4],
+    labelBgPadding: [6, 4] as [number, number],
     labelBgBorderRadius: 4,
     labelBgStyle: { fill: '#0f172a', fillOpacity: 0.85 }
   },
@@ -182,15 +182,15 @@ const initialEdges = [
     markerEnd: { type: MarkerType.ArrowClosed, color: '#ef4444' },
     label: '+15 mins',
     labelStyle: { fill: '#f87171', fontWeight: 600, fontSize: 10 },
-    labelBgPadding: [6, 4],
+    labelBgPadding: [6, 4] as [number, number],
     labelBgBorderRadius: 4,
     labelBgStyle: { fill: '#0f172a', fillOpacity: 0.85 }
   },
 ];
 
 export default function RippleMap() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, , onNodesChange] = useNodesState(initialNodes);
+  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState<any | null>(null);
 
   const onNodeClick = useCallback((_event: React.MouseEvent, node: any) => {
