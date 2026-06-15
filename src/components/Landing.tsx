@@ -14,9 +14,7 @@ import {
   HelpCircle,
   Activity,
   Layers,
-  ChevronRight,
-  Gauge,
-  BatteryCharging
+  ChevronRight
 } from "lucide-react";
 
 interface LandingProps {
@@ -69,6 +67,10 @@ function CountUp({ value, suffix = "" }: { value: number; suffix?: string }) {
 }
 
 export default function Landing({ onEnter }: LandingProps) {
+  // Entrance Loader states
+  const [introActive, setIntroActive] = useState(true);
+  const [introProgress, setIntroProgress] = useState(0);
+
   // Cascading Delay Radar State
   const [cascadeStep, setCascadeStep] = useState(-1);
   const [isCascading, setIsCascading] = useState(false);
@@ -80,98 +82,100 @@ export default function Landing({ onEnter }: LandingProps) {
   // FAQ Active State
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
-  // Train Interactive Speed Controls
-  const [trainSpeedMode, setTrainSpeedMode] = useState<"brake" | "cruise" | "hyper">("cruise");
-  
-  // Live Telemetry Physics States
-  const [telemetry, setTelemetry] = useState({
-    speed: 240,
-    power: 3200,
-    distance: 14.80,
-    station: "NK MAIN",
-    stationIdx: 0,
-  });
 
-  const trackPath = "M -150 150 C 200 30, 450 270, 700 150 C 950 30, 1200 270, 1550 150";
 
-  // Telemetry Engine loop (Physics ticks)
+
+
+  // Floating Boarding Tickets Mock Data (Themed to colorful vintage cardboard boarding passes)
+  const mockTickets = [
+    {
+      id: "t1",
+      from: "MUMBAI CENTRAL (MMCT)",
+      to: "HAZRAT NIZAMUDDIN (NZM)",
+      train: "12951 Rajdhani Exp",
+      seat: "AC-1A, Coach H1, Seat 24",
+      status: "CRITICAL RISK",
+      statusColor: "text-rose-800 border-rose-300 bg-rose-100/60",
+      delay: "+110m",
+      top: "16%",
+      left: "4%",
+      rotate: -10,
+      scale: 0.9,
+      delaySec: 0,
+      ticketBg: "#f2e5d5" // Warm Apricot Cardboard
+    },
+    {
+      id: "t2",
+      from: "NASHIK ROAD (NK)",
+      to: "BHOPAL JN (BPL)",
+      train: "11057 Amritsar Exp",
+      seat: "Sleeper, Coach S3, Seat 47",
+      status: "ON TIME",
+      statusColor: "text-emerald-800 border-emerald-300 bg-emerald-100/60",
+      delay: "0m",
+      top: "30%",
+      right: "5%",
+      rotate: 8,
+      scale: 0.92,
+      delaySec: 2,
+      ticketBg: "#e3ebd9" // Soft Sage Green
+    },
+    {
+      id: "t3",
+      from: "BHUSAVAL JN (BSL)",
+      to: "HAZRAT NIZAMUDDIN (NZM)",
+      train: "12721 Dakshin Exp",
+      seat: "AC-3A, Coach B2, Seat 12",
+      status: "CAUTION ALERT",
+      statusColor: "text-amber-850 border-amber-300 bg-amber-100/60",
+      delay: "+45m",
+      top: "58%",
+      left: "5%",
+      rotate: 12,
+      scale: 0.88,
+      delaySec: 1,
+      ticketBg: "#ebdcb9" // Warm Manila Buff
+    },
+    {
+      id: "t4",
+      from: "MUMBAI CENTRAL (MMCT)",
+      to: "BPL JUNCTION",
+      train: "12137 Punjab Mail",
+      seat: "AC-2A, Coach A1, Seat 32",
+      status: "ON TIME",
+      statusColor: "text-emerald-800 border-emerald-300 bg-emerald-100/60",
+      delay: "0m",
+      top: "76%",
+      right: "7%",
+      rotate: -8,
+      scale: 0.86,
+      delaySec: 3,
+      ticketBg: "#dce4ed" // Slate Blue Tint
+    }
+  ];
+
+  // Entrance Loader Progress effect
   useEffect(() => {
-    const stations = ["NK MAIN", "BSL JUNCTION", "BPL CENTRAL", "NZM TERMINUS"];
-    
-    const interval = setInterval(() => {
-      setTelemetry((prev) => {
-        let targetSpeed = 240;
-        let targetPower = 3200;
-        let accelRate = 18;
-        let powerRate = 300;
+    if (introActive) {
+      const duration = 2400; // 2.4 seconds
+      const startTime = performance.now();
+      
+      const updateProgress = (time: number) => {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        setIntroProgress(Math.floor(progress * 100));
         
-        if (trainSpeedMode === "brake") {
-          targetSpeed = 0;
-          targetPower = 45; // Idle auxiliary power
-          accelRate = 35; // Brake decelerates faster
-          powerRate = 600;
-        } else if (trainSpeedMode === "cruise") {
-          targetSpeed = 240;
-          targetPower = 3200;
-        } else if (trainSpeedMode === "hyper") {
-          targetSpeed = 482;
-          targetPower = 7950;
+        if (progress < 1) {
+          requestAnimationFrame(updateProgress);
+        } else {
+          setIntroActive(false);
         }
+      };
+      
+      requestAnimationFrame(updateProgress);
+    }
+  }, [introActive]);
 
-        // Smoothly interpolate speed
-        let currentSpeed = prev.speed;
-        if (prev.speed < targetSpeed) {
-          currentSpeed = Math.min(targetSpeed, prev.speed + accelRate);
-        } else if (prev.speed > targetSpeed) {
-          currentSpeed = Math.max(targetSpeed, prev.speed - accelRate);
-        } else if (targetSpeed > 0) {
-          // Micro fluctuations
-          currentSpeed = targetSpeed + Math.floor((Math.random() - 0.5) * 3);
-        }
-
-        // Smoothly interpolate power
-        let currentPower = prev.power;
-        if (prev.power < targetPower) {
-          currentPower = Math.min(targetPower, prev.power + powerRate);
-        } else if (prev.power > targetPower) {
-          currentPower = Math.max(targetPower, prev.power - powerRate);
-        } else if (targetSpeed > 0) {
-          currentPower = targetPower + Math.floor((Math.random() - 0.5) * 40);
-        }
-
-        // Distance countdown
-        // Speed determines decay speed of distance
-        const decayFactor = (currentSpeed / 3600) * 0.45; // Convert km/h to step delta
-        let nextDistance = prev.distance - decayFactor;
-        let nextStationIdx = prev.stationIdx;
-        let nextStationName = prev.station;
-
-        if (nextDistance <= 0) {
-          nextDistance = 15.0 + parseFloat((Math.random() * 10).toFixed(2));
-          nextStationIdx = (prev.stationIdx + 1) % stations.length;
-          nextStationName = stations[nextStationIdx];
-        }
-
-        return {
-          speed: currentSpeed,
-          power: currentPower,
-          distance: parseFloat(nextDistance.toFixed(2)),
-          station: nextStationName,
-          stationIdx: nextStationIdx,
-        };
-      });
-    }, 120);
-
-    return () => clearInterval(interval);
-  }, [trainSpeedMode]);
-
-  // Determine actual SVG CSS animation speed duration based on mode
-  let animDuration = 18;
-  if (trainSpeedMode === "brake") animDuration = 0; // Handled by play-state paused
-  else if (trainSpeedMode === "cruise") animDuration = 18;
-  else if (trainSpeedMode === "hyper") animDuration = 7;
-
-  const animPlayState = trainSpeedMode === "brake" ? "paused" : "running";
 
   // Simulate the cascaded delays step-by-step
   useEffect(() => {
@@ -199,31 +203,29 @@ export default function Landing({ onEnter }: LandingProps) {
   const netBuffer = transferBuffer - inboundDelay;
   let riskStatus: "safe" | "caution" | "critical" = "safe";
   let riskLabel = "Safe Connection";
-  let riskColorText = "text-emerald-400";
-  let riskBg = "bg-emerald-500/10 border-emerald-500/30";
+  let riskColorText = "text-emerald-700";
+  let riskBg = "bg-emerald-500/10 border-emerald-500/25";
   
   if (netBuffer >= 20) {
     riskStatus = "safe";
     riskLabel = "Safe Connection";
-    riskColorText = "text-emerald-400";
-    riskBg = "bg-emerald-500/10 border-emerald-500/30";
+    riskColorText = "text-emerald-700";
+    riskBg = "bg-emerald-500/10 border-emerald-500/25";
   } else if (netBuffer >= 0 && netBuffer < 20) {
     riskStatus = "caution";
     riskLabel = "High Alert / Tight Connection";
-    riskColorText = "text-amber-400";
-    riskBg = "bg-amber-500/10 border-amber-500/30";
+    riskColorText = "text-amber-700";
+    riskBg = "bg-amber-500/10 border-amber-500/25";
   } else {
     riskStatus = "critical";
     riskLabel = "Connection Missed";
-    riskColorText = "text-rose-400";
-    riskBg = "bg-rose-500/10 border-rose-500/30";
+    riskColorText = "text-rose-700";
+    riskBg = "bg-rose-500/10 border-rose-500/25";
   }
 
-  // Calculate gauge parameters
   const riskPercent = Math.min(100, Math.max(0, 50 - (netBuffer * 1.5)));
   const needleRotation = (riskPercent / 100) * 180 - 90;
 
-  // Radar Stations Definition
   const radarStations = [
     { code: "MMCT", name: "Mumbai Central", delay: cascadeStep >= 0 ? 15 : 0, status: cascadeStep >= 0 ? "slight" : "on-time" },
     { code: "NK", name: "Nashik Road", delay: cascadeStep >= 1 ? 45 : 0, status: cascadeStep >= 1 ? "moderate" : "on-time" },
@@ -233,83 +235,251 @@ export default function Landing({ onEnter }: LandingProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#06080c] text-[#e2e8f0] font-sans relative overflow-x-hidden selection:bg-violet-600/30">
+    <div className="min-h-screen bg-[#dfd2bc] text-[#2d251d] font-sans relative overflow-x-hidden selection:bg-amber-600/20">
       
-      {/* Inline styles for custom path-following Shinkansen bullet train */}
+      {/* Entrance Loader Overlay */}
+      <AnimatePresence>
+        {introActive && (
+          <motion.div
+            key="intro-loader"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#dfd2bc] pointer-events-auto"
+          >
+            <div className="absolute inset-0 bg-stitch-grid bg-blueprint-dots opacity-40 pointer-events-none" />
+            
+            {/* Grand Station Terminal Blueprint backdrop girders inside loader */}
+            <div className="absolute top-24 inset-x-0 h-[600px] pointer-events-none opacity-10 z-0 overflow-hidden">
+              <svg width="100%" height="100%" className="w-full h-full">
+                <path d="M -100 600 C 150 160, 550 160, 800 600" fill="none" stroke="rgba(180, 83, 9, 0.1)" strokeWidth="3" strokeDasharray="6,6" />
+                <path d="M 600 600 C 850 160, 1250 160, 1500 600" fill="none" stroke="rgba(180, 83, 9, 0.1)" strokeWidth="3" strokeDasharray="6,6" />
+              </svg>
+            </div>
+
+            <div className="w-full max-w-4xl px-8 relative flex flex-col items-center z-10">
+              {/* Header text */}
+              <div className="text-center mb-16 space-y-3">
+                <h2 className="text-3xl font-extrabold tracking-widest text-slate-900 font-mono">
+                  RIPPLE RAIL
+                </h2>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-100/60 border border-amber-300 rounded-full text-[10px] font-mono text-amber-800 font-bold uppercase tracking-wider">
+                  AMETHYST CORE v2.2 INITIALIZING
+                </div>
+              </div>
+              
+              {/* Track Line */}
+              <div className="w-full h-1 bg-[#c8bfa6] relative rounded-full overflow-visible mb-8">
+                {/* Horizontal sleepers */}
+                <div className="absolute -inset-y-1.5 inset-x-0 flex justify-between pointer-events-none opacity-30">
+                  {Array.from({ length: 40 }).map((_, i) => (
+                    <div key={i} className="w-0.5 h-4 bg-slate-900" />
+                  ))}
+                </div>
+                
+                {/* The Train on track */}
+                <motion.div
+                  style={{
+                    position: "absolute",
+                    left: `${-25 + (introProgress / 100) * 140}%`, // Goes from -25% to 115%
+                    top: "-12px",
+                    width: "220px",
+                  }}
+                  className="flex items-center justify-end"
+                >
+                  {/* Carriage 2 */}
+                  <div className="w-14 h-6 bg-[#f8fafc] border border-violet-500 rounded-l flex items-center justify-around px-1 shadow-md">
+                    <span className="w-2.5 h-1.5 bg-violet-600/20 rounded-sm" />
+                    <span className="w-2.5 h-1.5 bg-violet-600/20 rounded-sm" />
+                    <span className="w-2.5 h-1.5 bg-violet-600/20 rounded-sm" />
+                  </div>
+                  {/* Carriage 1 */}
+                  <div className="w-14 h-6 bg-[#f8fafc] border-y border-r border-violet-500 flex items-center justify-around px-1 shadow-md">
+                    <span className="w-2.5 h-1.5 bg-violet-600/20 rounded-sm" />
+                    <span className="w-2.5 h-1.5 bg-violet-600/20 rounded-sm" />
+                    <span className="w-2.5 h-1.5 bg-violet-600/20 rounded-sm" />
+                  </div>
+                  {/* Engine */}
+                  <div className="w-16 h-6 bg-[#f8fafc] border-y border-r border-cyan-500 rounded-r-full relative flex items-center shadow-md">
+                    <div className="absolute right-1.5 top-2.5 w-1.5 h-1.5 bg-yellow-400 rounded-full animate-ping" />
+                    <div className="absolute right-1.5 top-2.5 w-1.5 h-1.5 bg-yellow-300 rounded-full" />
+                    <span className="w-3 h-1.5 bg-cyan-500/25 rounded ml-2" />
+                    {/* Sleek windshield */}
+                    <div className="absolute right-4 top-0.5 w-5 h-2 bg-slate-900 rounded-tr-xl rounded-bl-sm transform -skew-x-12" />
+                  </div>
+                </motion.div>
+              </div>
+              
+              {/* Progress Bar & Telemetry */}
+              <div className="w-80 space-y-3 bg-[#ede4cf]/80 border border-[#c8bfa6] p-4 rounded-xl shadow-sm">
+                <div className="flex justify-between text-[11px] font-mono text-slate-700">
+                  <span className="flex items-center gap-1.5 font-bold">
+                    <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse" />
+                    SYNCING MATRIX
+                  </span>
+                  <span className="font-bold">{introProgress}%</span>
+                </div>
+                <div className="w-full h-2 bg-[#c8bfa6]/40 rounded-full overflow-hidden">
+                  <motion.div
+                    style={{ width: `${introProgress}%` }}
+                    className="h-full bg-gradient-to-r from-amber-700 via-orange-600 to-amber-800"
+                  />
+                </div>
+                <div className="text-[9px] font-mono text-slate-500 text-center uppercase tracking-wider">
+                  {introProgress < 25 && "Loading station coordinate grids..."}
+                  {introProgress >= 25 && introProgress < 50 && "Parsing down-line dependency logs..."}
+                  {introProgress >= 50 && introProgress < 75 && "Compiling cascading risk values..."}
+                  {introProgress >= 75 && "Finalizing terminal visualization feed..."}
+                </div>
+              </div>
+            </div>
+            
+            {/* Skip button in corner */}
+            <button
+              onClick={() => setIntroActive(false)}
+              className="absolute bottom-8 right-8 px-4 py-2 bg-[#ede4cf] hover:bg-[#e4d9be] border border-[#c8bfa6] text-slate-700 text-xs font-mono rounded-lg transition-all shadow-sm cursor-pointer hover:shadow"
+            >
+              Skip Intro
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        animate={{
+          filter: introActive ? `blur(${16 - (introProgress / 100) * 16}px)` : "blur(0px)",
+          opacity: introActive ? 0.3 + (introProgress / 100) * 0.7 : 1,
+        }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="w-full"
+      >
+
+      {/* Inline styles for custom layout */}
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes trainMove-engine {
-          0% { offset-distance: 0%; }
-          100% { offset-distance: 100%; }
-        }
-        @keyframes trainMove-car1 {
-          0% { offset-distance: -2.8%; }
-          100% { offset-distance: 97.2%; }
-        }
-        @keyframes trainMove-car2 {
-          0% { offset-distance: -5.6%; }
-          100% { offset-distance: 94.4%; }
-        }
-        .train-engine {
-          offset-path: path('${trackPath}');
-          offset-rotate: auto;
-          animation: trainMove-engine ${animDuration}s linear infinite;
-          animation-play-state: ${animPlayState};
-        }
-        .train-car1 {
-          offset-path: path('${trackPath}');
-          offset-rotate: auto;
-          animation: trainMove-car1 ${animDuration}s linear infinite;
-          animation-play-state: ${animPlayState};
-        }
-        .train-car2 {
-          offset-path: path('${trackPath}');
-          offset-rotate: auto;
-          animation: trainMove-car2 ${animDuration}s linear infinite;
-          animation-play-state: ${animPlayState};
-        }
         .bg-grid-glow {
-          background: radial-gradient(circle 800px at 50% 200px, rgba(139,92,246,0.06), transparent 70%);
-        }
-        .shinkansen-nose {
-          clip-path: polygon(0% 100%, 100% 100%, 100% 50%, 40% 40%, 0% 100%);
+          background: radial-gradient(circle 800px at 50% 200px, rgba(180,83,9,0.03), transparent 70%);
         }
       ` }} />
 
-      {/* Blueprint grid patterns (re-themed with Amethyst) */}
+      {/* Blueprint grid patterns */}
       <div className="absolute inset-0 bg-stitch-grid bg-blueprint-dots pointer-events-none opacity-90" />
       <div className="absolute top-0 inset-x-0 h-[850px] bg-grid-glow pointer-events-none" />
 
+      {/* Grand Station Terminal Blueprint backdrop girders */}
+      <div className="absolute top-24 inset-x-0 h-[600px] pointer-events-none opacity-20 z-0 overflow-hidden">
+        <svg width="100%" height="100%" className="w-full h-full">
+          {/* Main Arched roofs */}
+          <path d="M -100 600 C 150 160, 550 160, 800 600" fill="none" stroke="rgba(180, 83, 9, 0.1)" strokeWidth="3" strokeDasharray="6,6" />
+          <path d="M -100 600 C 150 130, 550 130, 800 600" fill="none" stroke="rgba(180, 83, 9, 0.04)" strokeWidth="1.5" />
+          
+          <path d="M 600 600 C 850 160, 1250 160, 1500 600" fill="none" stroke="rgba(180, 83, 9, 0.1)" strokeWidth="3" strokeDasharray="6,6" />
+          <path d="M 600 600 C 850 130, 1250 130, 1500 600" fill="none" stroke="rgba(180, 83, 9, 0.04)" strokeWidth="1.5" />
+
+          {/* Roof Truss cross girders */}
+          <line x1="350" y1="262" x2="350" y2="600" stroke="rgba(180, 83, 9, 0.03)" strokeWidth="1.5" strokeDasharray="2,4" />
+          <line x1="1050" y1="262" x2="1050" y2="600" stroke="rgba(180, 83, 9, 0.03)" strokeWidth="1.5" strokeDasharray="2,4" />
+        </svg>
+      </div>
+
+      {/* Floating Tickets Background Layer */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+        {mockTickets.map((ticket) => (
+          <motion.div
+            key={ticket.id}
+            style={{
+              position: "absolute",
+              top: ticket.top,
+              left: ticket.left,
+              right: ticket.right,
+              transform: `rotate(${ticket.rotate}deg) scale(${ticket.scale})`,
+              pointerEvents: "auto",
+              "--ticket-punch-bg": "#dfd2bc",
+              "--ticket-bg": ticket.ticketBg
+            } as any}
+            animate={{
+              y: [0, -18, 0],
+              rotate: [ticket.rotate, ticket.rotate + 3, ticket.rotate - 3, ticket.rotate],
+            }}
+            transition={{
+              duration: 11 + ticket.delaySec * 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            whileHover={{ 
+              scale: ticket.scale * 1.08, 
+              rotate: 0,
+              boxShadow: "0 20px 40px rgba(180, 83, 9, 0.12)",
+              borderColor: "rgba(180, 83, 9, 0.5)"
+            }}
+            className="floating-ticket p-5 w-64 border border-stitch border-amber-600/35 text-xs hidden xl:block cursor-pointer select-none transition-all duration-300"
+          >
+            <div className="ticket-punch-left" />
+            <div className="ticket-punch-right" />
+            <div className="flex justify-between items-center mb-3">
+              <span className="font-mono text-[9px] text-amber-700 font-bold uppercase tracking-wider">BOARDING TICKET</span>
+              <span className="font-mono text-[8px] text-amber-900/40">SERIAL #9048-26</span>
+            </div>
+            
+            <div className="space-y-2 mb-3 text-[11px]">
+              <div>
+                <span className="text-[9px] text-amber-900/40 uppercase block font-semibold">FROM</span>
+                <span className="font-bold text-slate-800">{ticket.from}</span>
+              </div>
+              <div>
+                <span className="text-[9px] text-amber-900/40 uppercase block font-semibold">TO</span>
+                <span className="font-bold text-slate-800">{ticket.to}</span>
+              </div>
+              <div className="flex justify-between">
+                <div>
+                  <span className="text-[9px] text-amber-900/40 uppercase block font-semibold">TRAIN</span>
+                  <span className="font-medium text-slate-600">{ticket.train}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] text-amber-900/40 uppercase block font-semibold">SEAT/CLASS</span>
+                  <span className="font-medium text-slate-600 truncate max-w-[90px] block">{ticket.seat.split(",")[0]}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-dashed border-[#ebdcb9] pt-3 flex justify-between items-center">
+              <span className={`text-[9px] font-bold font-mono px-2 py-0.5 border rounded-full ${ticket.statusColor}`}>
+                {ticket.status}
+              </span>
+              <span className="font-mono font-bold text-xs text-slate-600">{ticket.delay}</span>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
       {/* Top Navbar */}
-      <header className="sticky top-0 z-50 bg-[#06080c]/80 backdrop-blur-md border-b border-dashed border-violet-900/30 px-6 py-4">
+      <header className="sticky top-0 z-50 bg-[#f4eee1]/85 backdrop-blur-md border-b border-dashed border-[#e4d9c0] px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-violet-600/10 border border-stitch rounded-xl flex items-center justify-center glow-amethyst">
-              <Train className="w-5 h-5 text-violet-400" />
+            <div className="w-10 h-10 bg-amber-600/5 border border-stitch rounded-xl flex items-center justify-center">
+              <Train className="w-5 h-5 text-amber-700" />
             </div>
             <div>
-              <span className="text-lg font-bold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-300">
+              <span className="text-lg font-bold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-amber-700 to-orange-650">
                 RIPPLE RAIL
               </span>
-              <span className="block text-[9px] font-mono text-violet-500 uppercase tracking-widest mt-0.5">AMETHYST CORE v2.2</span>
+              <span className="block text-[9px] font-mono text-amber-600 uppercase tracking-widest mt-0.5">AMETHYST CORE v2.2</span>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
-            <a href="#how-it-works" className="hover:text-violet-400 transition-colors">How it Works</a>
-            <a href="#delay-radar" className="hover:text-violet-400 transition-colors">Cascading Radar</a>
-            <a href="#risk-calculator" className="hover:text-violet-400 transition-colors">Simulator</a>
-            <a href="#faqs" className="hover:text-violet-400 transition-colors">FAQs</a>
+          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+            <a href="#how-it-works" className="hover:text-amber-700 transition-colors">How it Works</a>
+            <a href="#delay-radar" className="hover:text-amber-700 transition-colors">Cascading Radar</a>
+            <a href="#risk-calculator" className="hover:text-amber-700 transition-colors">Simulator</a>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1 bg-slate-950/80 border border-dashed border-emerald-500/30 rounded-full text-[11px] font-mono text-emerald-400">
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1 bg-white border border-dashed border-emerald-500/30 rounded-full text-[11px] font-mono text-emerald-600">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              SYSTEM STATUS: NOMINAL
+              SYSTEM NOMINAL
             </div>
             <button 
               id="btn-nav-enter"
               onClick={onEnter}
-              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-semibold text-sm transition-all border border-violet-400/30 shadow-md shadow-violet-900/30 cursor-pointer"
+              className="px-4 py-2 bg-amber-700 hover:bg-amber-600 text-white rounded-lg font-semibold text-sm transition-all border border-amber-800/30 shadow-md shadow-amber-900/10 cursor-pointer"
             >
               Open Dashboard
             </button>
@@ -318,336 +488,132 @@ export default function Landing({ onEnter }: LandingProps) {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-12 pb-24 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <div className="lg:col-span-7 flex flex-col items-start z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-violet-950/30 border border-stitch rounded-full text-xs font-mono text-violet-400 mb-6 uppercase tracking-wider">
-            <Zap className="w-3.5 h-3.5 text-fuchsia-400" /> AMETHYST ENGINE DELAY PREDICTORS
-          </div>
-
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-none mb-6">
-            Train Delay <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400">
-              Ripple Calculator
-            </span>
-          </h1>
-
-          <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-xl leading-relaxed">
-            Predict missed connections before they happen. Our intelligent mapping models live delay propagation cascading across major stations to protect your itinerary.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-            <button
-              id="btn-hero-dashboard"
-              onClick={onEnter}
-              className="px-8 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-base font-bold rounded-xl shadow-lg shadow-violet-500/10 hover:shadow-fuchsia-500/20 border border-violet-400/20 transition-all flex items-center justify-center gap-2 group cursor-pointer"
-            >
-              Enter Delay Dashboard
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <a
-              href="#delay-radar"
-              className="px-8 py-4 bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white text-base font-bold rounded-xl border border-dashed border-slate-700 hover:border-slate-500 transition-all flex items-center justify-center gap-2"
-            >
-              Test Live Radar
-            </a>
-          </div>
-
-          {/* Metrics Panel */}
-          <div className="grid grid-cols-3 gap-6 mt-14 border-t border-dashed border-violet-900/20 pt-8 w-full max-w-lg">
-            <div>
-              <div className="text-2xl md:text-3xl font-extrabold text-violet-400 font-mono">
-                <CountUp value={10000} suffix="+" />
-              </div>
-              <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">Routes Analyzed</div>
-            </div>
-            <div>
-              <div className="text-2xl md:text-3xl font-extrabold text-fuchsia-400 font-mono">
-                <CountUp value={98} suffix="%" />
-              </div>
-              <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">ML Accuracy</div>
-            </div>
-            <div>
-              <div className="text-2xl md:text-3xl font-extrabold text-cyan-400 font-mono">
-                <CountUp value={500} suffix="+" />
-              </div>
-              <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">Stations Covered</div>
-            </div>
-          </div>
+      <section className="relative pt-16 pb-12 px-6 max-w-5xl mx-auto text-center z-20 flex flex-col items-center">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-amber-100/60 border border-amber-250 rounded-full text-xs font-mono text-amber-800 mb-6 uppercase tracking-wider font-semibold">
+          <Zap className="w-3.5 h-3.5 text-orange-600" /> AMETHYST ENGINE DELAY PREDICTORS
         </div>
 
-        {/* Enhanced SVG Bullet Train Track & Telemetry Dashboard */}
-        <div className="lg:col-span-5 relative w-full flex flex-col gap-4">
-          
-          {/* Main Visualizer screen */}
-          <div className="h-[260px] lg:h-[300px] w-full border border-stitch rounded-2xl bg-[#090c13]/70 backdrop-blur-md overflow-hidden shadow-2xl relative flex items-center justify-center">
-            
-            {/* Landscape blueprint background layers inside visualizer */}
-            <div className="absolute inset-0 pointer-events-none opacity-40 z-0">
-              {/* Star grid */}
-              <svg width="100%" height="100%">
-                {/* Background blueprint mountains */}
-                <path d="M 0 240 L 120 160 L 250 240 M 200 240 L 380 120 L 520 240 M 450 240 L 620 140 L 800 240 M 750 240 L 980 130 L 1150 240 M 1100 240 L 1250 150 L 1400 240" fill="none" stroke="rgba(139, 92, 246, 0.08)" strokeWidth="1.5" />
-                {/* Calibration crosshairs */}
-                <circle cx="100" cy="80" r="1.5" fill="rgba(139, 92, 246, 0.3)" />
-                <circle cx="1100" cy="180" r="1.5" fill="rgba(139, 92, 246, 0.3)" />
-                <circle cx="600" cy="60" r="1.5" fill="rgba(139, 92, 246, 0.3)" />
-                <line x1="100" y1="70" x2="100" y2="90" stroke="rgba(139, 92, 246, 0.15)" strokeWidth="1" />
-                <line x1="90" y1="80" x2="110" y2="80" stroke="rgba(139, 92, 246, 0.15)" strokeWidth="1" />
-                {/* Grid line indicator details */}
-                <text x="120" y="85" fill="rgba(139, 92, 246, 0.2)" fontSize="8" fontFamily="monospace">[AZM-73]</text>
-              </svg>
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-none mb-6 text-slate-900">
+          Train Delay <br />
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-700 via-amber-800 to-orange-600">
+            Ripple Calculator
+          </span>
+        </h1>
+
+        <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-xl leading-relaxed">
+          Predict missed connections before they happen. Our intelligent mapping models live delay propagation cascading across major stations to protect your itinerary.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto font-semibold">
+          <button
+            id="btn-hero-dashboard"
+            onClick={onEnter}
+            className="px-8 py-4 bg-gradient-to-r from-amber-700 to-orange-650 hover:from-amber-650 hover:to-orange-600 text-white text-base font-bold rounded-xl shadow-lg shadow-amber-900/20 border border-orange-500/10 transition-all flex items-center justify-center gap-2 group cursor-pointer"
+          >
+            Enter Delay Dashboard
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </button>
+          <a
+            href="#delay-radar"
+            className="px-8 py-4 bg-[#f5ebd2] hover:bg-[#faedd4]/30 text-amber-950 text-base font-bold rounded-xl border border-solid border-[#c8bfa6] shadow-sm transition-all flex items-center justify-center gap-2"
+          >
+            Monitor Delay Radar
+          </a>
+        </div>
+
+        {/* Hero Metrics Panel */}
+        <div className="grid grid-cols-3 gap-6 mt-16 border-t border-dashed border-[#e3d8be] pt-8 w-full max-w-lg z-20 relative">
+          <div>
+            <div className="text-2xl md:text-3xl font-extrabold text-amber-700 font-mono">
+              <CountUp value={10000} suffix="+" />
             </div>
-
-            <div className="absolute top-4 left-4 font-mono text-[9px] text-violet-500 tracking-wider flex items-center gap-2 z-10">
-              <Activity className="w-3.5 h-3.5 text-violet-400 animate-pulse" />
-              DYNAMIC VECTOR TELEMETRY
-            </div>
-
-            {/* Winding tracks and high-speed Shinkansen */}
-            <svg viewBox="0 0 1400 300" className="w-full h-full overflow-visible z-10 relative">
-              <defs>
-                <linearGradient id="headlight-beam" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#fef08a" stopOpacity="0.8" />
-                  <stop offset="25%" stopColor="#fef08a" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#fef08a" stopOpacity="0" />
-                </linearGradient>
-                <linearGradient id="shinkansen-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#8b5cf6" />
-                  <stop offset="100%" stopColor="#06b6d4" />
-                </linearGradient>
-              </defs>
-
-              {/* Signals along the tracks */}
-              {/* Signal 1 (X = 300) */}
-              <circle cx="280" cy="88" r="4.5" fill={trainSpeedMode === "brake" ? "#f43f5e" : "#10b981"} />
-              <line x1="280" y1="88" x2="280" y2="120" stroke="#475569" strokeWidth="2" />
-              
-              {/* Signal 2 (X = 900) */}
-              <circle cx="950" cy="80" r="4.5" fill={trainSpeedMode === "hyper" ? "#a855f7" : "#10b981"} className={trainSpeedMode === "hyper" ? "animate-pulse" : ""} />
-              <line x1="950" y1="80" x2="950" y2="105" stroke="#475569" strokeWidth="2" />
-
-              {/* Track Ties */}
-              <path d={trackPath} fill="none" stroke="#1e1b4b" strokeWidth="8" strokeDasharray="3,8" className="opacity-60" />
-
-              {/* Glowing Neon Rails */}
-              <path d={trackPath} fill="none" stroke="#2e1065" strokeWidth="4.5" />
-              <path d={trackPath} fill="none" stroke="url(#shinkansen-grad)" strokeWidth="1.5" className="opacity-80" />
-
-              {/* Shinkansen Carriage 2 */}
-              <g className="train-car2" style={{ transformBox: "fill-box", transformOrigin: "center" }}>
-                <line x1="-30" y1="0" x2="-26" y2="0" stroke="#64748b" strokeWidth="3" />
-                {/* Carriage body */}
-                <rect x="-26" y="-7.5" width="52" height="15" rx="3" fill="#f8fafc" stroke="#7c3aed" strokeWidth="1" />
-                <rect x="-26" y="2" width="52" height="2" fill="#7c3aed" /> {/* Violet cabin line */}
-                {/* Windows row */}
-                <rect x="-20" y="-3.5" width="6" height="3" fill="#0f172a" />
-                <rect x="-10" y="-3.5" width="6" height="3" fill="#0f172a" />
-                <rect x="0" y="-3.5" width="6" height="3" fill="#0f172a" />
-                <rect x="10" y="-3.5" width="6" height="3" fill="#0f172a" />
-                <rect x="20" y="-3.5" width="6" height="3" fill="#0f172a" />
-                {/* Wheels */}
-                <circle cx="-16" cy="9.5" r="3.5" fill="#0f172a" stroke="#64748b" strokeWidth="0.5" />
-                <circle cx="16" cy="9.5" r="3.5" fill="#0f172a" stroke="#64748b" strokeWidth="0.5" />
-              </g>
-
-              {/* Shinkansen Carriage 1 */}
-              <g className="train-car1" style={{ transformBox: "fill-box", transformOrigin: "center" }}>
-                <line x1="-30" y1="0" x2="-26" y2="0" stroke="#64748b" strokeWidth="3" />
-                {/* Carriage body */}
-                <rect x="-26" y="-7.5" width="52" height="15" rx="3" fill="#f8fafc" stroke="#7c3aed" strokeWidth="1" />
-                <rect x="-26" y="2" width="52" height="2" fill="#7c3aed" />
-                {/* Windows row */}
-                <rect x="-20" y="-3.5" width="6" height="3" fill="#0f172a" />
-                <rect x="-10" y="-3.5" width="6" height="3" fill="#0f172a" />
-                <rect x="0" y="-3.5" width="6" height="3" fill="#0f172a" />
-                <rect x="10" y="-3.5" width="6" height="3" fill="#0f172a" />
-                <rect x="20" y="-3.5" width="6" height="3" fill="#0f172a" />
-                {/* Wheels */}
-                <circle cx="-16" cy="9.5" r="3.5" fill="#0f172a" stroke="#64748b" strokeWidth="0.5" />
-                <circle cx="16" cy="9.5" r="3.5" fill="#0f172a" stroke="#64748b" strokeWidth="0.5" />
-              </g>
-
-              {/* Shinkansen Sleek Locomotive Engine */}
-              <g className="train-engine" style={{ transformBox: "fill-box", transformOrigin: "center" }}>
-                {/* Dynamic Headlight Glow */}
-                <polygon points="26,0 140,-45 140,45" fill="url(#headlight-beam)" opacity={trainSpeedMode === "brake" ? 0.2 : 0.8} />
-                
-                {/* Locomotive main body */}
-                <rect x="-26" y="-7.5" width="52" height="15" rx="3" fill="#f8fafc" stroke="#06b6d4" strokeWidth="1" />
-                <rect x="-26" y="2" width="52" height="2" fill="#06b6d4" /> {/* Cyan accent stripe */}
-
-                {/* Elongated aerodynamic cabin front */}
-                <path d="M 16 -7.5 Q 26 -7.5 29 -2.5 L 34 7.5 L 16 7.5 Z" fill="#f8fafc" stroke="#06b6d4" strokeWidth="0.5" />
-                {/* Aerodynamic windshield */}
-                <path d="M 18 -4.5 C 23 -4.5 24 -2.5 25 1 L 18 1 Z" fill="#0f172a" />
-
-                {/* Driver Cabin Window side */}
-                <rect x="-2" y="-3.5" width="8" height="3" rx="0.5" fill="#0f172a" />
-                <rect x="-14" y="-3.5" width="8" height="3" rx="0.5" fill="#0f172a" />
-                
-                {/* Wheels */}
-                <circle cx="-16" cy="9.5" r="3.5" fill="#0f172a" stroke="#64748b" strokeWidth="0.5" />
-                <circle cx="12" cy="9.5" r="3.5" fill="#0f172a" stroke="#64748b" strokeWidth="0.5" />
-              </g>
-            </svg>
-
-            {/* Glowing active outline */}
-            <div className={`absolute inset-0 border rounded-2xl pointer-events-none transition-all duration-300 ${
-              trainSpeedMode === "brake" 
-                ? "border-rose-500/20 shadow-[inset_0_0_15px_rgba(244,63,94,0.06)]"
-                : trainSpeedMode === "hyper"
-                ? "border-fuchsia-500/30 shadow-[inset_0_0_20px_rgba(168,85,247,0.1)]"
-                : "border-violet-500/20 shadow-[inset_0_0_15px_rgba(124,58,237,0.06)]"
-            }`} />
+            <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">Routes Analyzed</div>
           </div>
-
-          {/* Dynamic Interactive Telemetry Panel & Speed Controls */}
-          <div className="bg-[#090c13]/70 backdrop-blur-md border border-stitch rounded-2xl p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-xl relative stitch-corner stitch-corner-br">
-            
-            {/* Speed & telemetry numerical indicators */}
-            <div className="grid grid-cols-3 gap-3 flex-1">
-              <div className="px-3 py-2 bg-slate-950/60 rounded-xl border border-slate-900 flex flex-col">
-                <span className="text-[9px] font-mono text-slate-500 uppercase flex items-center gap-1">
-                  <Gauge className="w-2.5 h-2.5 text-cyan-400" /> Velocity
-                </span>
-                <span className="text-lg font-bold font-mono text-cyan-400 mt-0.5">
-                  {telemetry.speed} <span className="text-[10px] font-normal text-slate-500">km/h</span>
-                </span>
-              </div>
-
-              <div className="px-3 py-2 bg-slate-950/60 rounded-xl border border-slate-900 flex flex-col">
-                <span className="text-[9px] font-mono text-slate-500 uppercase flex items-center gap-1">
-                  <BatteryCharging className="w-2.5 h-2.5 text-fuchsia-400" /> Power Draw
-                </span>
-                <span className="text-lg font-bold font-mono text-fuchsia-400 mt-0.5">
-                  {telemetry.power} <span className="text-[10px] font-normal text-slate-500">kW</span>
-                </span>
-              </div>
-
-              <div className="px-3 py-2 bg-slate-950/60 rounded-xl border border-slate-900 flex flex-col">
-                <span className="text-[9px] font-mono text-slate-500 uppercase flex items-center gap-1 col-span-2">
-                  <Clock className="w-2.5 h-2.5 text-violet-400" /> Next Hub
-                </span>
-                <span className="text-sm font-bold font-mono text-violet-400 mt-0.5 leading-tight truncate">
-                  {telemetry.station}
-                </span>
-                <span className="text-[9px] font-mono text-slate-500">
-                  {telemetry.distance} km away
-                </span>
-              </div>
+          <div>
+            <div className="text-2xl md:text-3xl font-extrabold text-amber-850 font-mono">
+              <CountUp value={98} suffix="%" />
             </div>
-
-            {/* Interactive controls */}
-            <div className="flex items-center gap-1 bg-slate-950/60 border border-slate-900 p-1.5 rounded-xl self-center shrink-0">
-              <button 
-                id="btn-speed-brake"
-                onClick={() => setTrainSpeedMode("brake")}
-                className={`px-3 py-2 text-[10px] font-bold font-mono rounded-lg transition-all cursor-pointer uppercase ${
-                  trainSpeedMode === "brake"
-                    ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Brake
-              </button>
-
-              <button 
-                id="btn-speed-cruise"
-                onClick={() => setTrainSpeedMode("cruise")}
-                className={`px-3 py-2 text-[10px] font-bold font-mono rounded-lg transition-all cursor-pointer uppercase ${
-                  trainSpeedMode === "cruise"
-                    ? "bg-violet-500/20 text-violet-400 border border-violet-500/30"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Cruise
-              </button>
-
-              <button 
-                id="btn-speed-hyper"
-                onClick={() => setTrainSpeedMode("hyper")}
-                className={`px-3 py-2 text-[10px] font-bold font-mono rounded-lg transition-all cursor-pointer uppercase ${
-                  trainSpeedMode === "hyper"
-                    ? "bg-fuchsia-500/20 text-fuchsia-400 border border-fuchsia-500/30 shadow-fuchsia-500/5"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Boost
-              </button>
+            <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">ML Accuracy</div>
+          </div>
+          <div>
+            <div className="text-2xl md:text-3xl font-extrabold text-orange-600 font-mono">
+              <CountUp value={500} suffix="+" />
             </div>
+            <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">Stations Covered</div>
           </div>
         </div>
       </section>
 
+
+
       {/* How it works Walkthrough Section */}
-      <section id="how-it-works" className="relative py-20 px-6 border-y border-dashed border-violet-950/40 bg-slate-950/20">
+      <section id="how-it-works" className="relative py-20 px-6 border-y border-dashed border-[#c8bfa6] bg-[#d2c8ab]/20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-xs font-mono text-violet-500 uppercase tracking-widest mb-3">System Architecture</h2>
-            <h3 className="text-3xl md:text-5xl font-extrabold">Stitching the Journey</h3>
-            <p className="text-slate-400 mt-4 max-w-xl mx-auto">
+            <h2 className="text-xs font-mono text-amber-700 uppercase tracking-widest mb-3">System Architecture</h2>
+            <h3 className="text-3xl md:text-5xl font-extrabold text-slate-900">Stitching the Journey</h3>
+            <p className="text-slate-600 mt-4 max-w-xl mx-auto">
               How RippleRail computes dynamic bottleneck ripples to project exact arrival and safety margins.
             </p>
           </div>
 
           <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 z-10">
-            {/* Background dashed connecting line on desktop */}
-            <div className="absolute top-1/2 left-[10%] right-[10%] h-0.5 border-t border-dashed border-violet-800/20 -translate-y-1/2 hidden md:block z-0" />
+            <div className="absolute top-1/2 left-[10%] right-[10%] h-0.5 border-t border-dashed border-[#c8bfa6] -translate-y-1/2 hidden md:block z-0" />
 
             {/* Step 1 */}
             <motion.div 
               whileHover={{ y: -6 }}
-              className="bg-[#090c13]/80 border border-stitch rounded-2xl p-6 relative stitch-corner stitch-corner-tl stitch-corner-br flex flex-col justify-between h-full z-10 shadow-lg"
+              className="bg-[#f5ebd2] border border-[#c8bfa6] rounded-2xl p-6 relative stitch-corner stitch-corner-tl stitch-corner-br flex flex-col justify-between h-full z-10 shadow-sm hover:shadow-md hover:border-amber-500/50 transition-all duration-300"
             >
               <div>
-                <div className="w-12 h-12 bg-violet-600/10 border border-stitch rounded-xl flex items-center justify-center text-violet-400 font-mono font-bold text-lg mb-6 shadow-sm">
+                <div className="w-12 h-12 bg-amber-100/60 border border-amber-200 rounded-xl flex items-center justify-center text-amber-800 font-mono font-bold text-lg mb-6 shadow-inner">
                   01
                 </div>
-                <h4 className="text-xl font-bold mb-3">Input Route Matrix</h4>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <h4 className="text-xl font-bold mb-3 text-slate-800">Input Route Matrix</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">
                   Provide your target train schedule details, connection points, and layover buffer windows to compile your active tracking nodes.
                 </p>
               </div>
-              <div className="border-t border-dashed border-violet-900/20 pt-4 mt-6 text-xs text-violet-500 font-mono uppercase tracking-wider flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-fuchsia-400" /> Real-time Sync
+              <div className="border-t border-dashed border-[#c8bfa6]/60 pt-4 mt-6 text-xs text-slate-400 font-mono uppercase tracking-wider flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-amber-700" /> Real-time Sync
               </div>
             </motion.div>
 
             {/* Step 2 */}
             <motion.div 
               whileHover={{ y: -6 }}
-              className="bg-[#090c13]/80 border border-stitch rounded-2xl p-6 relative stitch-corner stitch-corner-tr stitch-corner-bl flex flex-col justify-between h-full z-10 shadow-lg"
+              className="bg-[#f5ebd2] border border-[#c8bfa6] rounded-2xl p-6 relative stitch-corner stitch-corner-tr stitch-corner-bl flex flex-col justify-between h-full z-10 shadow-sm hover:shadow-md hover:border-teal-500/50 transition-all duration-300"
             >
               <div>
-                <div className="w-12 h-12 bg-fuchsia-600/10 border border-stitch rounded-xl flex items-center justify-center text-fuchsia-400 font-mono font-bold text-lg mb-6 shadow-sm">
+                <div className="w-12 h-12 bg-teal-100/60 border border-teal-200 rounded-xl flex items-center justify-center text-teal-800 font-mono font-bold text-lg mb-6 shadow-inner">
                   02
                 </div>
-                <h4 className="text-xl font-bold mb-3">Ripple Propagation Model</h4>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <h4 className="text-xl font-bold mb-3 text-slate-800">Ripple Propagation Model</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">
                   Our system traces down-line train dependencies, weather patterns, and hub occupancy logs to simulate cascaded delays across the track lines.
                 </p>
               </div>
-              <div className="border-t border-dashed border-violet-900/20 pt-4 mt-6 text-xs text-fuchsia-500 font-mono uppercase tracking-wider flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-fuchsia-400" /> Multi-Layer Calculus
+              <div className="border-t border-dashed border-[#c8bfa6]/60 pt-4 mt-6 text-xs text-slate-400 font-mono uppercase tracking-wider flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-teal-650" /> Multi-Layer Calculus
               </div>
             </motion.div>
 
             {/* Step 3 */}
             <motion.div 
               whileHover={{ y: -6 }}
-              className="bg-[#090c13]/80 border border-stitch rounded-2xl p-6 relative stitch-corner stitch-corner-tl stitch-corner-br flex flex-col justify-between h-full z-10 shadow-lg"
+              className="bg-[#f5ebd2] border border-[#c8bfa6] rounded-2xl p-6 relative stitch-corner stitch-corner-tl stitch-corner-br flex flex-col justify-between h-full z-10 shadow-sm hover:shadow-md hover:border-indigo-500/50 transition-all duration-300"
             >
               <div>
-                <div className="w-12 h-12 bg-cyan-600/10 border border-stitch rounded-xl flex items-center justify-center text-cyan-400 font-mono font-bold text-lg mb-6 shadow-sm">
+                <div className="w-12 h-12 bg-indigo-100/60 border border-indigo-200 rounded-xl flex items-center justify-center text-indigo-800 font-mono font-bold text-lg mb-6 shadow-inner">
                   03
                 </div>
-                <h4 className="text-xl font-bold mb-3">Alternative Action Plan</h4>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <h4 className="text-xl font-bold mb-3 text-slate-800">Alternative Action Plan</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">
                   If risk bounds are broken, receive immediate alternative trains, bus connections, or cab estimations to keep your travel on track.
                 </p>
               </div>
-              <div className="border-t border-dashed border-violet-900/20 pt-4 mt-6 text-xs text-cyan-500 font-mono uppercase tracking-wider flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" /> Guarantee Route
+              <div className="border-t border-dashed border-[#c8bfa6]/60 pt-4 mt-6 text-xs text-slate-400 font-mono uppercase tracking-wider flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" /> Guarantee Route
               </div>
             </motion.div>
           </div>
@@ -655,15 +621,15 @@ export default function Landing({ onEnter }: LandingProps) {
       </section>
 
       {/* Interactive Section 1: Live Cascading Delay Radar */}
-      <section id="delay-radar" className="py-24 px-6 max-w-7xl mx-auto">
+      <section id="delay-radar" className="py-24 px-6 max-w-7xl mx-auto z-20 relative">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           <div className="lg:col-span-5 flex flex-col items-start">
-            <h2 className="text-xs font-mono text-violet-400 uppercase tracking-widest mb-3">Live Cascadence Visualizer</h2>
-            <h3 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
+            <h2 className="text-xs font-mono text-amber-700 uppercase tracking-widest mb-3">Live Cascadence Visualizer</h2>
+            <h3 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight text-slate-900">
               Watch Delays Cascade in Real Time
             </h3>
-            <p className="text-slate-400 mb-8 leading-relaxed">
+            <p className="text-slate-600 mb-8 leading-relaxed">
               Trains don't run in isolation. A delay at a primary terminal ripples across the entire network. Click the button to inject a simulated delay at Mumbai Central and watch the ripple propagate down to Hazrat Nizamuddin.
             </p>
 
@@ -671,16 +637,16 @@ export default function Landing({ onEnter }: LandingProps) {
               id="btn-trigger-cascade"
               onClick={triggerCascade}
               disabled={isCascading}
-              className="px-6 py-3.5 bg-slate-900 border border-stitch text-slate-100 hover:bg-violet-950/40 hover:text-violet-400 disabled:opacity-50 transition-all font-semibold rounded-xl flex items-center gap-3 shadow-md group cursor-pointer"
+              className="px-6 py-3.5 bg-[#ede4cf] border border-[#c8bfa6] text-amber-950 hover:bg-[#e4d9be] disabled:opacity-50 transition-all font-semibold rounded-xl flex items-center gap-3 shadow-sm hover:shadow-md cursor-pointer"
             >
               {isCascading ? (
                 <>
-                  <RefreshCw className="w-5 h-5 text-violet-400 animate-spin" />
+                  <RefreshCw className="w-5 h-5 text-amber-700 animate-spin" />
                   Propagating Cascades...
                 </>
               ) : (
                 <>
-                  <Play className="w-5 h-5 text-violet-400 group-hover:scale-110 transition-transform" />
+                  <Play className="w-5 h-5 text-amber-700" />
                   Inject delay at Mumbai (+15m)
                 </>
               )}
@@ -690,11 +656,11 @@ export default function Landing({ onEnter }: LandingProps) {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-6 p-4 rounded-xl border border-dashed border-rose-500/30 bg-rose-950/20 text-xs flex gap-3 max-w-md animate-pulse"
+                className="mt-6 p-4 rounded-xl border border-dashed border-rose-200/60 bg-rose-50 text-xs flex gap-3 max-w-md text-rose-700"
               >
                 <AlertTriangle className="w-5 h-5 text-rose-500 shrink-0" />
                 <div>
-                  <span className="font-bold text-rose-400 block mb-0.5">CASCADE ALERT REPORTED</span>
+                  <span className="font-bold text-rose-600 block mb-0.5">CASCADE ALERT REPORTED</span>
                   Inbound delay at Mumbai has compounded over subsequent hubs. Connecting trains at Hazrat Nizamuddin are now marked at extreme risk of failure.
                 </div>
               </motion.div>
@@ -702,72 +668,62 @@ export default function Landing({ onEnter }: LandingProps) {
           </div>
 
           {/* Interactive Node Path Graph */}
-          <div className="lg:col-span-7 bg-[#090c13]/80 border border-stitch rounded-2xl p-8 relative stitch-corner stitch-corner-tr stitch-corner-bl shadow-2xl">
-            <div className="absolute top-4 right-4 flex items-center gap-1.5 font-mono text-[9px] text-slate-500">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-ping" />
+          <div className="lg:col-span-7 bg-[#f5ebd2] border border-[#c8bfa6] rounded-2xl p-8 relative stitch-corner stitch-corner-tr stitch-corner-bl shadow-md">
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 font-mono text-[9px] text-slate-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-ping" />
               SIMULATED RADAR FEED
             </div>
             
-            <h4 className="font-bold text-lg mb-8 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-violet-500" />
+            <h4 className="font-bold text-lg mb-8 flex items-center gap-2 text-slate-800">
+              <Activity className="w-5 h-5 text-amber-700" />
               Mumbai-Delhi Express Corridor Cascade
             </h4>
 
             {/* Nodes Wrapper */}
             <div className="flex flex-col gap-8 relative">
-              {/* Vertical link line behind on mobile */}
-              <div className="absolute left-[23px] top-6 bottom-6 w-0.5 border-l border-dashed border-slate-800/40 md:hidden z-0" />
+              <div className="absolute left-[23px] top-6 bottom-6 w-0.5 border-l border-dashed border-[#c8bfa6]/60 md:hidden z-0" />
 
               {radarStations.map((station, idx) => {
                 const isDelayed = station.delay > 0;
-                let circleColor = "bg-slate-900 border-slate-700 text-slate-500";
-                let badgeStyle = "bg-slate-950 text-slate-500 border-slate-850";
+                let circleColor = "bg-[#ede4cf] border-[#c8bfa6] text-slate-600";
+                let badgeStyle = "bg-[#ede4cf] text-slate-600 border-[#c8bfa6]";
                 
                 if (station.status === "slight") {
-                  circleColor = "bg-emerald-950/80 border-emerald-500 text-emerald-400 glow-emerald";
-                  badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+                  circleColor = "bg-emerald-100/60 border-emerald-400 text-emerald-800 glow-emerald";
+                  badgeStyle = "bg-emerald-100/60 text-emerald-800 border-emerald-200";
                 } else if (station.status === "moderate") {
-                  circleColor = "bg-amber-950/80 border-amber-500 text-amber-400 glow-amber";
-                  badgeStyle = "bg-amber-500/10 text-amber-400 border-amber-500/30";
+                  circleColor = "bg-amber-100/60 border-amber-400 text-amber-800 glow-amber";
+                  badgeStyle = "bg-amber-100/60 text-amber-800 border-amber-200";
                 } else if (station.status === "high" || station.status === "missed") {
-                  circleColor = "bg-rose-950/80 border-rose-500 text-rose-400 glow-red animate-pulse";
-                  badgeStyle = "bg-rose-500/10 text-rose-400 border-rose-500/30";
+                  circleColor = "bg-rose-100/60 border-rose-450 text-rose-800 glow-red animate-pulse";
+                  badgeStyle = "bg-rose-100/60 text-rose-800 border-rose-250";
                 }
 
                 return (
                   <div key={station.code} className="flex items-center justify-between z-10 relative">
-                    
-                    {/* Node circle & details */}
                     <div className="flex items-center gap-4">
-                      {/* Circle indicator */}
                       <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all duration-500 ${circleColor}`}>
                         {station.code}
                       </div>
-
-                      {/* Station Name */}
                       <div>
-                        <span className="font-bold block text-sm md:text-base">{station.name}</span>
-                        <span className="text-xs text-slate-500">Scheduled Stop</span>
+                        <span className="font-bold block text-sm md:text-base text-slate-700">{station.name}</span>
+                        <span className="text-xs text-slate-400 font-semibold">Scheduled Stop</span>
                       </div>
                     </div>
 
-                    {/* Delay & Risk status details */}
                     <div className="flex items-center gap-4">
-                      {/* Connection arrow between nodes on desktop */}
                       {idx < radarStations.length - 1 && (
-                        <div className="hidden md:flex items-center gap-1 opacity-40">
-                          <span className={`w-1.5 h-1.5 rounded-full ${cascadeStep >= idx ? "bg-rose-500 animate-ping" : "bg-slate-700"}`} />
-                          <ChevronRight className="w-4 h-4 text-slate-600" />
+                        <div className="hidden md:flex items-center gap-1 opacity-45">
+                          <span className={`w-1.5 h-1.5 rounded-full ${cascadeStep >= idx ? "bg-rose-500 animate-ping" : "bg-[#c8bfa6]"}`} />
+                          <ChevronRight className="w-4 h-4 text-[#c8bfa6]" />
                         </div>
                       )}
 
-                      {/* Output details */}
                       <div className="text-right">
                         <span className={`text-xs font-mono font-bold px-2.5 py-1 rounded-full border ${badgeStyle} transition-all duration-500`}>
                           {isDelayed ? `+${station.delay}m delay` : "On Time"}
                         </span>
-                        
-                        <span className="block text-[10px] text-slate-500 font-mono mt-1">
+                        <span className="block text-[10px] text-slate-400 font-mono mt-1">
                           {idx === 0 && isDelayed && "Inbound Impact"}
                           {idx > 0 && idx < 3 && isDelayed && "Casading Ripple"}
                           {idx >= 3 && isDelayed && "Connection Missed!"}
@@ -775,36 +731,32 @@ export default function Landing({ onEnter }: LandingProps) {
                         </span>
                       </div>
                     </div>
-
                   </div>
                 );
               })}
             </div>
 
-            {/* Quick reset */}
             {cascadeStep >= 0 && (
               <div className="mt-8 flex justify-end">
                 <button
                   onClick={() => setCascadeStep(-1)}
-                  className="text-xs font-mono text-slate-500 hover:text-slate-350 transition-colors flex items-center gap-1"
+                  className="text-xs font-mono text-slate-400 hover:text-slate-650 transition-colors flex items-center gap-1"
                 >
                   <RefreshCw className="w-3.5 h-3.5" /> Clear Simulation
                 </button>
               </div>
             )}
-
           </div>
-
         </div>
       </section>
 
       {/* Interactive Section 2: Journey Buffer & Risk Simulator Widget */}
-      <section id="risk-calculator" className="py-20 px-6 bg-[#07090e] border-t border-dashed border-violet-950/40">
+      <section id="risk-calculator" className="py-20 px-6 bg-[#dbd1b5] border-t border-dashed border-[#c8bfa6] z-20 relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-xs font-mono text-violet-400 uppercase tracking-widest mb-3">Hands-On Playground</h2>
-            <h3 className="text-3xl md:text-5xl font-extrabold">Instant Connection Risk Gauge</h3>
-            <p className="text-slate-400 mt-4 max-w-xl mx-auto">
+            <h2 className="text-xs font-mono text-amber-700 uppercase tracking-widest mb-3">Hands-On Playground</h2>
+            <h3 className="text-3xl md:text-5xl font-extrabold text-slate-900">Instant Connection Risk Gauge</h3>
+            <p className="text-slate-600 mt-4 max-w-xl mx-auto">
               Simulate travel timings. Adjust transfer windows and delayed arrivals to see how safe your connection is.
             </p>
           </div>
@@ -812,20 +764,20 @@ export default function Landing({ onEnter }: LandingProps) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
             
             {/* Input Sliders Column */}
-            <div className="lg:col-span-7 bg-[#090c13]/80 border border-stitch rounded-2xl p-6 md:p-8 flex flex-col justify-between shadow-xl">
+            <div className="lg:col-span-7 bg-[#f5ebd2] border border-[#c8bfa6] rounded-2xl p-6 md:p-8 flex flex-col justify-between shadow-md">
               <div>
-                <h4 className="font-bold text-lg mb-6 flex items-center gap-2">
-                  <Layers className="w-5 h-5 text-violet-500" />
+                <h4 className="font-bold text-lg mb-6 flex items-center gap-2 text-slate-800">
+                  <Layers className="w-5 h-5 text-amber-700" />
                   Parameters Config Panel
                 </h4>
 
                 {/* Slider 1: Transfer Window */}
                 <div className="mb-8">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-semibold text-slate-300 flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-violet-400" /> Planned Transfer Window
+                    <span className="text-sm font-semibold text-slate-600 flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-amber-700" /> Planned Transfer Window
                     </span>
-                    <span className="font-mono text-sm text-violet-400 font-bold px-2 py-0.5 bg-violet-500/10 border border-violet-500/20 rounded-md">
+                    <span className="font-mono text-sm text-amber-750 font-bold px-2 py-0.5 bg-[#ede4cf] border border-[#c8bfa6] rounded-md">
                       {transferBuffer} mins
                     </span>
                   </div>
@@ -837,9 +789,9 @@ export default function Landing({ onEnter }: LandingProps) {
                     step="5"
                     value={transferBuffer}
                     onChange={(e) => setTransferBuffer(parseInt(e.target.value))}
-                    className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-violet-500"
+                    className="w-full h-1.5 bg-[#eadeca] rounded-lg appearance-none cursor-pointer accent-amber-600"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-500 font-mono mt-1">
+                  <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-1">
                     <span>15 MINS (TIGHT)</span>
                     <span>60 MINS</span>
                     <span>120 MINS (RELAXED)</span>
@@ -849,10 +801,10 @@ export default function Landing({ onEnter }: LandingProps) {
                 {/* Slider 2: Inbound Delay */}
                 <div className="mb-6">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-semibold text-slate-300 flex items-center gap-1.5">
-                      <AlertTriangle className="w-4 h-4 text-amber-400" /> Inbound Train Delay
+                    <span className="text-sm font-semibold text-slate-600 flex items-center gap-1.5">
+                      <AlertTriangle className="w-4 h-4 text-orange-600" /> Inbound Train Delay
                     </span>
-                    <span className="font-mono text-sm text-amber-400 font-bold px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded-md">
+                    <span className="font-mono text-sm text-orange-700 font-bold px-2 py-0.5 bg-[#ede4cf] border border-[#c8bfa6] rounded-md">
                       {inboundDelay} mins
                     </span>
                   </div>
@@ -864,9 +816,9 @@ export default function Landing({ onEnter }: LandingProps) {
                     step="5"
                     value={inboundDelay}
                     onChange={(e) => setInboundDelay(parseInt(e.target.value))}
-                    className="w-full h-1.5 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                    className="w-full h-1.5 bg-[#eadeca] rounded-lg appearance-none cursor-pointer accent-orange-600"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-500 font-mono mt-1">
+                  <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-1">
                     <span>0 MINS (ON TIME)</span>
                     <span>60 MINS</span>
                     <span>120 MINS (SEVERE)</span>
@@ -875,18 +827,18 @@ export default function Landing({ onEnter }: LandingProps) {
               </div>
 
               {/* Summary details */}
-              <div className="border-t border-dashed border-violet-900/20 pt-6 mt-6">
-                <h5 className="text-xs font-mono text-violet-500 uppercase tracking-widest mb-3">Live Risk Projection</h5>
-                <div className={`p-4 rounded-xl border ${riskBg} transition-all duration-300`}>
+              <div className="border-t border-dashed border-[#c8bfa6] pt-6 mt-6">
+                <h5 className="text-xs font-mono text-amber-700 uppercase tracking-widest mb-3">Live Risk Projection</h5>
+                <div className={`p-4 rounded-xl border ${riskBg} transition-all duration-350`}>
                   <span className={`text-base font-bold flex items-center gap-2 ${riskColorText}`}>
                     {riskStatus === "safe" && <ShieldCheck className="w-5 h-5 shrink-0" />}
                     {riskStatus === "caution" && <AlertTriangle className="w-5 h-5 shrink-0" />}
                     {riskStatus === "critical" && <ShieldAlert className="w-5 h-5 shrink-0" />}
                     {riskLabel}
                   </span>
-                  <p className="text-sm text-slate-300 mt-2 leading-relaxed">
+                  <p className="text-sm text-slate-600 mt-2 leading-relaxed">
                     {riskStatus === "safe" && `Your transfer timeline is completely secure. You will arrive with a comfortable buffer margin of ${netBuffer} minutes before the outgoing connection departs.`}
-                    {riskStatus === "caution" && `Extremely tight connection window! A net buffer of only ${netBuffer} minutes remains. A slight delay hike could result in missing the train. Monitor live radar updates.`}
+                    {riskStatus === "caution" && `Extremely tight connection window! A net buffer of only ${netBuffer} minutes remains. A slight delay hike could result in missing the train. Monitor live updates.`}
                     {riskStatus === "critical" && `Warning! Outgoing train departed ${Math.abs(netBuffer)} minutes before your inbound arrival. RippleRail recommends routing through alternatives immediately.`}
                   </p>
                 </div>
@@ -894,14 +846,14 @@ export default function Landing({ onEnter }: LandingProps) {
             </div>
 
             {/* Gauge Dial Panel */}
-            <div className="lg:col-span-5 bg-[#090c13]/80 border border-stitch rounded-2xl p-6 md:p-8 flex flex-col items-center justify-between text-center relative stitch-corner stitch-corner-tl stitch-corner-br shadow-xl">
-              <div className="absolute top-4 left-4 font-mono text-[9px] text-slate-500">
+            <div className="lg:col-span-5 bg-[#f5ebd2] border border-[#c8bfa6] rounded-2xl p-6 md:p-8 flex flex-col items-center justify-between text-center relative stitch-corner stitch-corner-tl stitch-corner-br shadow-md">
+              <div className="absolute top-4 left-4 font-mono text-[9px] text-slate-450">
                 GAUGE FEED: ANALOG OUT
               </div>
 
               <div>
-                <h4 className="font-bold text-lg mb-2">Calculated Risk Factor</h4>
-                <p className="text-xs text-slate-500">Dynamic Risk Margin Indicator</p>
+                <h4 className="font-bold text-lg mb-2 text-slate-800">Calculated Risk Factor</h4>
+                <p className="text-xs text-slate-405">Dynamic Risk Margin Indicator</p>
               </div>
 
               {/* Arc Dial SVG */}
@@ -909,13 +861,12 @@ export default function Landing({ onEnter }: LandingProps) {
                 <svg viewBox="0 0 200 100" className="w-full h-full overflow-visible">
                   <defs>
                     <linearGradient id="gauge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#10b981" /> {/* Green */}
-                      <stop offset="50%" stopColor="#f59e0b" /> {/* Amber */}
-                      <stop offset="100%" stopColor="#ef4444" /> {/* Red */}
+                      <stop offset="0%" stopColor="#10b981" /> 
+                      <stop offset="50%" stopColor="#f59e0b" /> 
+                      <stop offset="100%" stopColor="#ef4444" /> 
                     </linearGradient>
                   </defs>
 
-                  {/* Dial Arc */}
                   <path 
                     d="M 20 90 A 80 80 0 0 1 180 90" 
                     fill="none" 
@@ -925,19 +876,17 @@ export default function Landing({ onEnter }: LandingProps) {
                     className="opacity-95"
                   />
 
-                  {/* Background Track support */}
                   <path 
                     d="M 20 90 A 80 80 0 0 1 180 90" 
                     fill="none" 
-                    stroke="#1e293b" 
+                    stroke="#e2e8f0" 
                     strokeWidth="2.5" 
                     strokeDasharray="4,6"
-                    className="opacity-40"
+                    className="opacity-60"
                   />
 
-                  {/* Center Hub */}
-                  <circle cx="100" cy="90" r="6" fill="#7c3aed" />
-                  <circle cx="100" cy="90" r="3" fill="#0f172a" />
+                  <circle cx="100" cy="90" r="6" fill="#b45309" />
+                  <circle cx="100" cy="90" r="3" fill="#f8fafc" />
 
                   {/* Indicator Needle */}
                   <g transform={`rotate(${needleRotation} 100 90)`} className="transition-transform duration-500 ease-out">
@@ -946,21 +895,20 @@ export default function Landing({ onEnter }: LandingProps) {
                       y1="90" 
                       x2="100" 
                       y2="15" 
-                      stroke="#f8fafc" 
+                      stroke="#475569" 
                       strokeWidth="2.5" 
                       strokeLinecap="round" 
-                      className="shadow-md"
+                      className="shadow-sm"
                     />
-                    <polygon points="100,10 97,18 103,18" fill="#f8fafc" />
+                    <polygon points="100,10 97,18 103,18" fill="#475569" />
                   </g>
                 </svg>
 
-                {/* Risk Percentage Display */}
                 <div className="absolute bottom-0 inset-x-0 flex flex-col items-center">
-                  <span className="text-3xl font-extrabold font-mono text-white">
+                  <span className="text-3xl font-extrabold font-mono text-slate-800">
                     {Math.round(riskPercent)}%
                   </span>
-                  <span className="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Risk Level</span>
+                  <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">Risk Level</span>
                 </div>
               </div>
 
@@ -968,7 +916,7 @@ export default function Landing({ onEnter }: LandingProps) {
               <div className="w-full mt-4">
                 <button
                   onClick={onEnter}
-                  className="w-full px-4 py-3 bg-slate-900 hover:bg-violet-600 hover:text-white transition-all text-xs font-mono border border-stitch rounded-xl font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full px-4 py-3 bg-[#ede4cf] hover:bg-[#b45309] hover:text-white transition-all text-xs font-mono border border-[#c8bfa6] hover:border-amber-500 rounded-xl font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer text-amber-900"
                 >
                   Analyze with Real Schedules
                   <ArrowRight className="w-4 h-4" />
@@ -981,45 +929,45 @@ export default function Landing({ onEnter }: LandingProps) {
       </section>
 
       {/* Advanced Features Spotlight */}
-      <section className="py-24 px-6 max-w-7xl mx-auto">
+      <section className="py-24 px-6 max-w-7xl mx-auto z-20 relative">
         <div className="text-center mb-16">
-          <h2 className="text-xs font-mono text-violet-500 uppercase tracking-widest mb-3">Enterprise Core Features</h2>
-          <h3 className="text-3xl md:text-5xl font-extrabold">Engineered for Rail Resilience</h3>
-          <p className="text-slate-400 mt-4 max-w-xl mx-auto">
+          <h2 className="text-xs font-mono text-amber-700 uppercase tracking-widest mb-3">Enterprise Core Features</h2>
+          <h3 className="text-3xl md:text-5xl font-extrabold text-slate-900">Engineered for Rail Resilience</h3>
+          <p className="text-slate-505 mt-4 max-w-xl mx-auto">
             Deep scheduling data combined with localized predictive graphs to give you maximum travel assurance.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Card 1 */}
-          <div className="bg-[#090c13]/80 border border-stitch p-6 rounded-2xl relative stitch-corner stitch-corner-tl hover:border-violet-500/50 transition-colors shadow-lg">
-            <div className="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center mb-6 glow-amethyst">
-              <Zap className="w-6 h-6 text-violet-400" />
+          <div className="bg-[#f5ebd2] border border-[#c8bfa6] p-6 rounded-2xl relative stitch-corner stitch-corner-tl hover:border-amber-500/40 transition-colors shadow-sm hover:shadow-md">
+            <div className="w-12 h-12 rounded-xl bg-amber-100/60 border border-amber-200 flex items-center justify-center mb-6">
+              <Zap className="w-6 h-6 text-amber-800" />
             </div>
-            <h4 className="text-lg font-bold text-slate-100 mb-3">Predictive Delay Models</h4>
-            <p className="text-sm text-slate-400 leading-relaxed">
+            <h4 className="text-lg font-bold text-slate-800 mb-3">Predictive Delay Models</h4>
+            <p className="text-sm text-slate-500 leading-relaxed">
               We compile regional congestion data, buffer thresholds, and layout structures to estimate real cascades in minutes, not estimates.
             </p>
           </div>
 
           {/* Card 2 */}
-          <div className="bg-[#090c13]/80 border border-stitch p-6 rounded-2xl relative stitch-corner stitch-corner-tr hover:border-fuchsia-500/50 transition-colors shadow-lg">
-            <div className="w-12 h-12 rounded-xl bg-fuchsia-500/10 border border-fuchsia-500/30 flex items-center justify-center mb-6 shadow-md shadow-fuchsia-500/5">
-              <Layers className="w-6 h-6 text-fuchsia-400" />
+          <div className="bg-[#f5ebd2] border border-[#c8bfa6] p-6 rounded-2xl relative stitch-corner stitch-corner-tr hover:border-teal-500/40 transition-colors shadow-sm hover:shadow-md">
+            <div className="w-12 h-12 rounded-xl bg-teal-100/60 border border-teal-200 flex items-center justify-center mb-6">
+              <Layers className="w-6 h-6 text-teal-700" />
             </div>
-            <h4 className="text-lg font-bold text-slate-100 mb-3">Ripple Propagation Maps</h4>
-            <p className="text-sm text-slate-400 leading-relaxed">
+            <h4 className="text-lg font-bold text-slate-800 mb-3">Ripple Propagation Maps</h4>
+            <p className="text-sm text-slate-505 leading-relaxed">
               Visualize how delays propagate through visual maps using node networks to trace cascade warnings down individual trains.
             </p>
           </div>
 
           {/* Card 3 */}
-          <div className="bg-[#090c13]/80 border border-stitch p-6 rounded-2xl relative stitch-corner hover:border-cyan-500/50 transition-colors shadow-lg">
-            <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mb-6 glow-cyan">
-              <ShieldCheck className="w-6 h-6 text-cyan-400" />
+          <div className="bg-[#f5ebd2] border border-[#c8bfa6] p-6 rounded-2xl relative stitch-corner hover:border-indigo-500/40 transition-colors shadow-sm hover:shadow-md">
+            <div className="w-12 h-12 rounded-xl bg-indigo-100/60 border border-indigo-200 flex items-center justify-center mb-6">
+              <ShieldCheck className="w-6 h-6 text-indigo-700" />
             </div>
-            <h4 className="text-lg font-bold text-slate-100 mb-3">Mitigation & Safety Buffers</h4>
-            <p className="text-sm text-slate-400 leading-relaxed">
+            <h4 className="text-lg font-bold text-slate-800 mb-3">Mitigation & Safety Buffers</h4>
+            <p className="text-sm text-slate-505 leading-relaxed">
               Get alert notification triggers and automated backup alternatives recommendations for other routes, buses, or cabs instantly.
             </p>
           </div>
@@ -1027,11 +975,11 @@ export default function Landing({ onEnter }: LandingProps) {
       </section>
 
       {/* FAQs Section */}
-      <section id="faqs" className="py-20 px-6 bg-[#07090e] border-t border-dashed border-violet-950/40">
+      <section id="faqs" className="py-20 px-6 bg-[#dbd1b5] border-t border-dashed border-[#c8bfa6] z-20 relative">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-xs font-mono text-violet-400 uppercase tracking-widest mb-3">Support & Information</h2>
-            <h3 className="text-3xl md:text-4xl font-extrabold">Frequently Asked Questions</h3>
+            <h2 className="text-xs font-mono text-amber-700 uppercase tracking-widest mb-3">Support & Information</h2>
+            <h3 className="text-3xl md:text-4xl font-extrabold text-slate-900">Frequently Asked Questions</h3>
           </div>
 
           <div className="space-y-4">
@@ -1057,17 +1005,17 @@ export default function Landing({ onEnter }: LandingProps) {
               return (
                 <div 
                   key={idx}
-                  className="bg-[#090c13]/80 border border-stitch-muted rounded-xl overflow-hidden transition-all duration-300"
+                  className="bg-[#f5ebd2] border border-[#c8bfa6] rounded-xl overflow-hidden transition-all duration-300"
                 >
                   <button
                     onClick={() => setActiveFaq(isOpen ? null : idx)}
-                    className="w-full px-6 py-5 flex items-center justify-between text-left font-bold text-sm md:text-base hover:bg-slate-950/30 transition-colors"
+                    className="w-full px-6 py-5 flex items-center justify-between text-left font-bold text-sm md:text-base hover:bg-[#ede4cf]/50 text-slate-700 transition-colors"
                   >
                     <span className="flex items-center gap-3">
-                      <HelpCircle className="w-5 h-5 text-violet-500 shrink-0" />
+                      <HelpCircle className="w-5 h-5 text-amber-700 shrink-0" />
                       {faq.q}
                     </span>
-                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform duration-300 ${isOpen ? "rotate-180 text-violet-400" : ""}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${isOpen ? "rotate-180 text-amber-600" : ""}`} />
                   </button>
 
                   <AnimatePresence initial={false}>
@@ -1078,7 +1026,7 @@ export default function Landing({ onEnter }: LandingProps) {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.25, ease: "easeInOut" }}
                       >
-                        <div className="px-6 pb-6 pt-2 text-sm text-slate-400 leading-relaxed border-t border-dashed border-violet-900/10">
+                        <div className="px-6 pb-6 pt-2 text-sm text-slate-505 leading-relaxed border-t border-dashed border-[#c8bfa6]/30">
                           {faq.a}
                         </div>
                       </motion.div>
@@ -1092,30 +1040,31 @@ export default function Landing({ onEnter }: LandingProps) {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-dashed border-violet-950/40 bg-[#06080c] py-12 px-6">
+      <footer className="border-t border-dashed border-[#c8bfa6] bg-[#d2c8ab]/30 py-12 px-6 z-20 relative">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-violet-600/10 border border-stitch rounded-lg flex items-center justify-center animate-pulse">
-              <Train className="w-4 h-4 text-violet-400" />
+            <div className="w-8 h-8 bg-amber-600/10 border border-[#c8bfa6] rounded-lg flex items-center justify-center">
+              <Train className="w-4 h-4 text-amber-700" />
             </div>
             <div>
-              <span className="text-sm font-bold tracking-wider text-slate-200">RIPPLE RAIL</span>
-              <span className="block text-[8px] font-mono text-slate-500 uppercase">Route Safety Engine</span>
+              <span className="text-sm font-bold tracking-wider text-slate-900">RIPPLE RAIL</span>
+              <span className="block text-[8px] font-mono text-slate-400 uppercase">Route Safety Engine</span>
             </div>
           </div>
 
-          <div className="flex gap-8 text-xs font-mono text-slate-500">
+          <div className="flex gap-8 text-xs font-mono text-slate-450">
             <span>© 2026 RIPPLE RAIL LABS</span>
             <span>LICENSED BY RAIL OPERATIONS</span>
             <button 
               onClick={onEnter}
-              className="hover:text-violet-400 transition-colors underline cursor-pointer"
+              className="hover:text-amber-700 text-slate-500 transition-colors underline cursor-pointer"
             >
               LAUNCH CONSOLE
             </button>
           </div>
         </div>
       </footer>
+      </motion.div>
 
     </div>
   );

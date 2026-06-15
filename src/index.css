@@ -207,3 +207,39 @@
   }
 }
 
+/* Vintage Ticket Aesthetics */
+.floating-ticket {
+  background: var(--ticket-bg, #fcf8ed);
+  backdrop-filter: blur(16px);
+  border: 1px dashed rgba(180, 83, 9, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(180, 83, 9, 0.06);
+}
+
+.ticket-punch-left {
+  position: absolute;
+  top: 50%;
+  left: -8px;
+  width: 16px;
+  height: 16px;
+  background: var(--ticket-punch-bg, #dfd2bc);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  border: 1px dashed rgba(180, 83, 9, 0.35);
+  clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%, 50% 0%);
+}
+
+.ticket-punch-right {
+  position: absolute;
+  top: 50%;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  background: var(--ticket-punch-bg, #dfd2bc);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  border: 1px dashed rgba(180, 83, 9, 0.35);
+  clip-path: polygon(0% 0%, 50% 0%, 50% 100%, 0% 100%, 0% 0%);
+}
+
+
