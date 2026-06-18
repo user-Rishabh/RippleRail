@@ -16,11 +16,11 @@ import { Network } from 'lucide-react';
 function CustomStationNode({ data }: { data: any }) {
   const isHighRisk = data.status === 'high-delay';
   
-  let statusClasses = "bg-emerald-950/40 border-emerald-500/50 text-emerald-400";
+  let statusClasses = "bg-[#1D9E75]/10 border-[#1D9E75]/50 text-[#1D9E75]";
   if (data.status === 'slight-delay') {
-    statusClasses = "bg-amber-950/40 border-amber-500/50 text-amber-400";
+    statusClasses = "bg-amber-500/10 border-amber-500/50 text-amber-400";
   } else if (data.status === 'high-delay') {
-    statusClasses = "bg-red-950/40 border-red-500/50 text-red-400";
+    statusClasses = "bg-red-500/10 border-red-500/50 text-red-400";
   }
 
   return (
@@ -139,13 +139,13 @@ const initialEdges = [
     source: '1', 
     target: '2', 
     animated: true, 
-    style: { stroke: '#10b981', strokeWidth: 2 }, 
-    markerEnd: { type: MarkerType.ArrowClosed, color: '#10b981' },
+    style: { stroke: '#1D9E75', strokeWidth: 2 }, 
+    markerEnd: { type: MarkerType.ArrowClosed, color: '#1D9E75' },
     label: '+15 mins',
-    labelStyle: { fill: '#34d399', fontWeight: 600, fontSize: 10 },
+    labelStyle: { fill: '#1D9E75', fontWeight: 600, fontSize: 10 },
     labelBgPadding: [6, 4] as [number, number],
     labelBgBorderRadius: 4,
-    labelBgStyle: { fill: '#0f172a', fillOpacity: 0.85 }
+    labelBgStyle: { fill: '#0D0B1A', fillOpacity: 0.85 }
   },
   { 
     id: 'e2-3', 
@@ -158,7 +158,7 @@ const initialEdges = [
     labelStyle: { fill: '#fbbf24', fontWeight: 600, fontSize: 10 },
     labelBgPadding: [6, 4] as [number, number],
     labelBgBorderRadius: 4,
-    labelBgStyle: { fill: '#0f172a', fillOpacity: 0.85 }
+    labelBgStyle: { fill: '#0D0B1A', fillOpacity: 0.85 }
   },
   { 
     id: 'e3-4', 
@@ -171,7 +171,7 @@ const initialEdges = [
     labelStyle: { fill: '#f87171', fontWeight: 600, fontSize: 10 },
     labelBgPadding: [6, 4] as [number, number],
     labelBgBorderRadius: 4,
-    labelBgStyle: { fill: '#0f172a', fillOpacity: 0.85 }
+    labelBgStyle: { fill: '#0D0B1A', fillOpacity: 0.85 }
   },
   { 
     id: 'e4-5', 
@@ -184,7 +184,7 @@ const initialEdges = [
     labelStyle: { fill: '#f87171', fontWeight: 600, fontSize: 10 },
     labelBgPadding: [6, 4] as [number, number],
     labelBgBorderRadius: 4,
-    labelBgStyle: { fill: '#0f172a', fillOpacity: 0.85 }
+    labelBgStyle: { fill: '#0D0B1A', fillOpacity: 0.85 }
   },
 ];
 
@@ -201,13 +201,13 @@ export default function RippleMap() {
     <div className="bg-card border border-border rounded-xl p-6 h-[500px] flex flex-col shadow-sm">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-3">
-          <Network className="w-6 h-6 text-primary" />
+          <Network className="w-6 h-6 text-[#7F77DD]" />
           <div>
             <h2 className="text-xl font-bold leading-tight">Delay Ripple Visualization</h2>
             {/* Legend */}
             <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground flex-wrap">
               <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                <span className="w-2 h-2 rounded-full bg-[#1D9E75] shadow-[0_0_8px_rgba(29,158,117,0.5)]"></span>
                 <span>On Time</span>
               </div>
               <div className="flex items-center gap-1.5">
@@ -253,8 +253,8 @@ export default function RippleMap() {
             fitView
             attributionPosition="bottom-right"
           >
-            <Background color="#333" gap={16} />
-            <Controls className="bg-slate-900 border border-slate-700 rounded-lg p-1 text-white fill-slate-300 [&_button]:bg-transparent [&_button]:border-none [&_button]:text-white [&_button]:hover:bg-slate-800" />
+            <Background color="rgba(127, 119, 221, 0.15)" gap={16} />
+            <Controls className="bg-[#13102A] border border-[#FFFFFF12] rounded-xl p-1 text-white fill-slate-300 [&_button]:bg-transparent [&_button]:border-none [&_button]:text-white [&_button]:hover:bg-[#0D0B1A]" />
           </ReactFlow>
 
           {/* Selected Node Details Tooltip Overlay */}
@@ -262,7 +262,7 @@ export default function RippleMap() {
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="absolute bottom-4 left-4 z-20 bg-slate-900 border border-slate-700 p-4 rounded-xl shadow-xl max-w-xs text-white"
+              className="absolute bottom-4 left-4 z-20 bg-[#13102A] border border-[#FFFFFF12] p-4 rounded-xl shadow-xl max-w-xs text-white"
             >
               <div className="flex justify-between items-start mb-2 gap-4">
                 <h4 className="font-bold text-sm">{selectedNode.data.stationName}</h4>
@@ -280,7 +280,7 @@ export default function RippleMap() {
                   Risk: 
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                     selectedNode.data.status === 'on-time' 
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                      ? 'bg-[#1D9E75]/20 text-[#1D9E75] border border-[#1D9E75]/30' 
                       : selectedNode.data.status === 'slight-delay'
                       ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                       : 'bg-red-500/20 text-red-400 border border-red-500/30'

@@ -10,9 +10,9 @@ export default function AlternativePlanner() {
       cost: "₹850",
       icon: TrainFront,
       recommendation: "Best option if you miss connection.",
-      color: "text-blue-500",
-      bg: "bg-blue-500/10",
-      border: "border-blue-500/30"
+      color: "text-[#7F77DD]",
+      bg: "bg-[#7F77DD]/10",
+      border: "border-[#7F77DD]/20"
     },
     {
       type: "Bus",
@@ -21,9 +21,9 @@ export default function AlternativePlanner() {
       cost: "₹600",
       icon: Bus,
       recommendation: "Fastest immediate departure.",
-      color: "text-green-500",
-      bg: "bg-green-500/10",
-      border: "border-green-500/30"
+      color: "text-[#1D9E75]",
+      bg: "bg-[#1D9E75]/10",
+      border: "border-[#1D9E75]/20"
     },
     {
       type: "Cab",
@@ -32,9 +32,9 @@ export default function AlternativePlanner() {
       cost: "₹2,400",
       icon: Car,
       recommendation: "Most expensive, but immediate.",
-      color: "text-orange-500",
-      bg: "bg-orange-500/10",
-      border: "border-orange-500/30"
+      color: "text-[#7F77DD]",
+      bg: "bg-[#7F77DD]/10",
+      border: "border-[#7F77DD]/20"
     }
   ];
 
@@ -57,7 +57,7 @@ export default function AlternativePlanner() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-semibold">{alt.type} - {alt.name}</h3>
                   {index === 0 && (
-                    <span className="px-2 py-0.5 text-xs font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.2)] animate-pulse">
+                    <span className="px-2 py-0.5 text-xs font-bold text-[#1D9E75] bg-[#1D9E75]/10 border border-[#1D9E75]/20 rounded-full shadow-[0_0_10px_rgba(29,158,117,0.2)] animate-pulse">
                       Best Choice
                     </span>
                   )}

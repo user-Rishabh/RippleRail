@@ -19,9 +19,9 @@ export default function AlertCenter() {
       time: "15 mins ago",
       type: "info",
       icon: Info,
-      color: "text-blue-500",
-      bg: "bg-blue-500/10",
-      border: "border-blue-500/30"
+      color: "text-[#1D9E75]",
+      bg: "bg-[#1D9E75]/10",
+      border: "border-[#1D9E75]/30"
     }
   ];
 
@@ -49,7 +49,7 @@ export default function AlertCenter() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Bell className="w-6 h-6 text-primary" />
+            <Bell className="w-6 h-6 text-[#7F77DD]" />
             {alerts.length > 0 && (
               <span className="absolute -top-1 -right-1 flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -73,7 +73,7 @@ export default function AlertCenter() {
             className={`p-4 rounded-lg border ${alert.border} border-l-4 ${
               alert.type === "warning"
                 ? "border-l-yellow-500 bg-yellow-500/[0.04]"
-                : "border-l-blue-500 bg-blue-500/[0.04]"
+                : "border-l-[#1D9E75] bg-[#1D9E75]/[0.04]"
             } bg-background flex gap-4 items-start shadow-sm hover:shadow-md transition-shadow`}
           >
             <div className={`p-2 rounded-full ${alert.bg} mt-1`}>

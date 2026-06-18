@@ -44,7 +44,7 @@ export default function Dashboard({ onBack }: DashboardProps) {
           repeat: Infinity,
           ease: "linear"
         }}
-        className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-500 via-indigo-600 to-blue-500 bg-[length:200%_100%] z-50"
+        className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary via-cyan-500 to-primary bg-[length:200%_100%] z-50"
       />
 
       <div className="max-w-7xl mx-auto">
@@ -55,7 +55,7 @@ export default function Dashboard({ onBack }: DashboardProps) {
               variants={titleContainerVariants}
               initial="hidden"
               animate="visible"
-              className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400"
+              className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-cyan-400"
             >
               {titleText.split("").map((char, index) => (
                 <motion.span key={index} variants={titleCharVariants}>

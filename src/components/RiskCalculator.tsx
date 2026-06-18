@@ -230,15 +230,15 @@ Safe travels!
   // Helper for dynamic colors
   const getRiskColor = (level: string) => {
     switch (level) {
-      case "Safe": return "text-green-500";
+      case "Safe": return "text-[#1D9E75]";
       case "Moderate": return "text-yellow-500";
       case "High Risk": return "text-red-500";
-      default: return "text-primary";
+      default: return "text-[#7F77DD]";
     }
   };
 
   const RiskIcon = ({ level }: { level: string }) => {
-    if (level === "Safe") return <ShieldCheck className="w-5 h-5 text-green-500" />;
+    if (level === "Safe") return <ShieldCheck className="w-5 h-5 text-[#1D9E75]" />;
     if (level === "Moderate") return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
     return <ShieldAlert className="w-5 h-5 text-red-500" />;
   };
@@ -246,7 +246,7 @@ Safe travels!
   return (
     <div className="bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
       <div className="flex items-center gap-3 mb-6">
-        <Calculator className="w-6 h-6 text-primary" />
+        <Calculator className="w-6 h-6 text-[#7F77DD]" />
         <h2 className="text-xl font-bold">Connection Risk Calculator</h2>
       </div>
 
@@ -308,7 +308,7 @@ Safe travels!
             onChange={(e) => setConnectionStation(e.target.value)}
             type="text" 
             placeholder="e.g. BPL" 
-            className="w-full bg-background border border-border rounded-lg p-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" 
+            className="w-full bg-background border border-border rounded-lg p-3 outline-none focus:border-[#7F77DD] focus:ring-1 focus:ring-[#7F77DD] transition-all" 
           />
         </div>
 
@@ -316,7 +316,7 @@ Safe travels!
           <button
             type="submit"
             disabled={loading || !currentTrain || !connectingTrain || !boardingStation || !connectionStation}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg p-3 flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#7F77DD] hover:bg-[#534AB7] text-white font-semibold rounded-lg p-3 flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
@@ -344,7 +344,7 @@ Safe travels!
           </div>
           
           <div className="grid grid-cols-2 gap-6 md:gap-4 md:grid-cols-4">
-            <div className="bg-secondary/30 p-3 rounded-lg border border-border/50 flex items-center justify-between gap-3">
+            <div className="bg-[#13102A]/50 p-3 rounded-lg border border-border/50 flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Catch Probability</p>
                 <p className={`text-3xl font-bold ${getRiskColor(result.riskLevel)}`}>{result.catchProbability}%</p>
@@ -365,7 +365,7 @@ Safe travels!
                     r="20"
                     className={
                       result.catchProbability > 70
-                        ? "stroke-emerald-500"
+                        ? "stroke-[#1D9E75]"
                         : result.catchProbability >= 40
                         ? "stroke-yellow-500"
                         : "stroke-red-500"
@@ -381,11 +381,11 @@ Safe travels!
                 </svg>
               </div>
             </div>
-            <div className="bg-secondary/30 p-3 rounded-lg border border-border/50">
+            <div className="bg-[#13102A]/50 p-3 rounded-lg border border-border/50">
               <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Expected Delay</p>
               <p className="text-3xl font-bold text-orange-500">{result.expectedDelay}<span className="text-sm font-medium text-muted-foreground ml-1">mins</span></p>
             </div>
-            <div className="col-span-2 bg-secondary/30 p-3 rounded-lg border border-border/50">
+            <div className="col-span-2 bg-[#13102A]/50 p-3 rounded-lg border border-border/50">
               <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Recommendation</p>
               <div className="flex items-start gap-2">
                 <div className="mt-0.5">
@@ -412,7 +412,7 @@ Safe travels!
               className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg border border-border bg-card hover:bg-secondary/80 hover:text-foreground text-muted-foreground transition-all duration-200 cursor-pointer shadow-sm hover:shadow"
             >
               <Download className="w-3.5 h-3.5" />
-              Download PDF
+              Download Summary
             </button>
             <button
               type="button"
@@ -436,10 +436,10 @@ Safe travels!
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 text-sm font-semibold pointer-events-none"
             style={{
-              backgroundColor: toast.type === "success" ? "rgba(16, 185, 129, 0.95)" : "rgba(239, 68, 68, 0.95)",
+              backgroundColor: toast.type === "success" ? "rgba(29, 158, 117, 0.95)" : "rgba(239, 68, 68, 0.95)",
               color: "#fff",
               backdropFilter: "blur(4px)",
-              border: toast.type === "success" ? "1px solid rgba(16, 185, 129, 0.2)" : "1px solid rgba(239, 68, 68, 0.2)",
+              border: toast.type === "success" ? "1px solid rgba(29, 158, 117, 0.2)" : "1px solid rgba(239, 68, 68, 0.2)",
             }}
           >
             {toast.type === "success" ? (

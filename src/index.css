@@ -3,32 +3,32 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
 
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
 
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
 
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
 
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
 
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
 
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -37,72 +37,70 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: #0D0B1A;
+    --foreground: #FFFFFF;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: #13102A;
+    --card-foreground: #FFFFFF;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: #13102A;
+    --popover-foreground: #FFFFFF;
 
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
+    --primary: #7F77DD;
+    --primary-foreground: #FFFFFF;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: #1D9E75;
+    --secondary-foreground: #FFFFFF;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: #13102A;
+    --muted-foreground: #9B98B8;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: #1D9E75;
+    --accent-foreground: #FFFFFF;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: #EF4444;
+    --destructive-foreground: #FFFFFF;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --border: #FFFFFF12;
+    --input: #FFFFFF12;
+    --ring: #7F77DD;
 
-    --radius: 0.5rem;
+    --radius: 12px;
     
     /* Railway Theme Safe/Moderate/High */
-    --safe: 142.1 76.2% 36.3%;
-    --moderate: 47.9 95.8% 53.1%;
-    --high-risk: 0 84.2% 60.2%;
+    --safe: #1D9E75;
+    --moderate: #F59E0B;
+    --high-risk: #EF4444;
   }
 
   .dark {
-    /* Midnight Obsidian Background */
-    --background: 240 25% 4.5%;
-    --foreground: 210 40% 98%;
+    --background: #0D0B1A;
+    --foreground: #FFFFFF;
 
-    --card: 240 25% 6.5%;
-    --card-foreground: 210 40% 98%;
+    --card: #13102A;
+    --card-foreground: #FFFFFF;
 
-    --popover: 240 25% 6.5%;
-    --popover-foreground: 210 40% 98%;
+    --popover: #13102A;
+    --popover-foreground: #FFFFFF;
 
-    /* Electric Amethyst Violet Accent */
-    --primary: 262.5 83.3% 57.8%;
-    --primary-foreground: 210 40% 98%;
+    --primary: #7F77DD;
+    --primary-foreground: #FFFFFF;
 
-    --secondary: 240 20% 12%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: #1D9E75;
+    --secondary-foreground: #FFFFFF;
 
-    --muted: 240 20% 12%;
-    --muted-foreground: 240 10% 65%;
+    --muted: #13102A;
+    --muted-foreground: #9B98B8;
 
-    --accent: 240 20% 12%;
-    --accent-foreground: 210 40% 98%;
+    --accent: #1D9E75;
+    --accent-foreground: #FFFFFF;
 
-    --destructive: 346.5 87% 43.5%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: #EF4444;
+    --destructive-foreground: #FFFFFF;
 
-    --border: 240 18% 15%;
-    --input: 240 18% 15%;
-    --ring: 262.5 83.3% 57.8%;
+    --border: #FFFFFF12;
+    --input: #FFFFFF12;
+    --ring: #7F77DD;
   }
 }
 
@@ -113,6 +111,41 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Selection Highlight */
+  ::selection {
+    background-color: rgba(127, 119, 221, 0.3);
+    color: #FFFFFF;
+  }
+
+  /* Scrollbars */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(127, 119, 221, 0.4) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(127, 119, 221, 0.4);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(127, 119, 221, 0.6);
+  }
+
+  /* All dividers/hr */
+  hr {
+    border-color: #FFFFFF10;
+  }
 }
 
 /* Stitched Blueprint Utilities */
@@ -120,25 +153,25 @@
   .bg-stitch-grid {
     background-size: 40px 40px;
     background-image: 
-      linear-gradient(to right, rgba(139, 92, 246, 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
+      linear-gradient(to right, rgba(127, 119, 221, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(127, 119, 221, 0.04) 1px, transparent 1px);
   }
 
   .bg-blueprint-dots {
     background-size: 20px 20px;
-    background-image: radial-gradient(rgba(139, 92, 246, 0.06) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(127, 119, 221, 0.06) 1px, transparent 1px);
   }
 
   .border-stitch {
-    border: 1px dashed rgba(139, 92, 246, 0.3);
+    border: 1px dashed rgba(127, 119, 221, 0.3);
   }
 
   .border-stitch-muted {
-    border: 1px dashed rgba(148, 163, 184, 0.15);
+    border: 1px dashed rgba(155, 152, 184, 0.15);
   }
 
   .border-stitch-success {
-    border: 1px dashed rgba(16, 185, 129, 0.45);
+    border: 1px dashed rgba(29, 158, 117, 0.45);
   }
 
   .border-stitch-warning {
@@ -150,15 +183,15 @@
   }
 
   .glow-amethyst {
-    box-shadow: 0 0 25px rgba(139, 92, 246, 0.22);
+    box-shadow: 0 0 25px rgba(127, 119, 221, 0.22);
   }
 
   .glow-cyan {
-    box-shadow: 0 0 25px rgba(6, 182, 212, 0.22);
+    box-shadow: 0 0 25px rgba(29, 158, 117, 0.22);
   }
 
   .glow-emerald {
-    box-shadow: 0 0 25px rgba(16, 185, 129, 0.22);
+    box-shadow: 0 0 25px rgba(29, 158, 117, 0.22);
   }
 
   .glow-red {
@@ -176,7 +209,7 @@
     font-family: monospace;
     font-size: 11px;
     font-weight: 300;
-    color: rgba(139, 92, 246, 0.45);
+    color: rgba(127, 119, 221, 0.45);
     line-height: 1;
     z-index: 10;
     pointer-events: none;
@@ -209,11 +242,11 @@
 
 /* Vintage Ticket Aesthetics */
 .floating-ticket {
-  background: var(--ticket-bg, #fcf8ed);
+  background: var(--ticket-bg, hsl(var(--card)));
   backdrop-filter: blur(16px);
-  border: 1px dashed rgba(180, 83, 9, 0.35);
+  border: 1px dashed rgba(127, 119, 221, 0.25);
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(180, 83, 9, 0.06);
+  box-shadow: 0 10px 30px rgba(127, 119, 221, 0.05);
 }
 
 .ticket-punch-left {
@@ -222,10 +255,10 @@
   left: -8px;
   width: 16px;
   height: 16px;
-  background: var(--ticket-punch-bg, #dfd2bc);
+  background: var(--ticket-punch-bg, hsl(var(--background)));
   border-radius: 50%;
   transform: translateY(-50%);
-  border: 1px dashed rgba(180, 83, 9, 0.35);
+  border: 1px dashed rgba(127, 119, 221, 0.25);
   clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%, 50% 0%);
 }
 
@@ -235,11 +268,9 @@
   right: -8px;
   width: 16px;
   height: 16px;
-  background: var(--ticket-punch-bg, #dfd2bc);
+  background: var(--ticket-punch-bg, hsl(var(--background)));
   border-radius: 50%;
   transform: translateY(-50%);
-  border: 1px dashed rgba(180, 83, 9, 0.35);
+  border: 1px dashed rgba(127, 119, 221, 0.25);
   clip-path: polygon(0% 0%, 50% 0%, 50% 100%, 0% 100%, 0% 0%);
 }
-
-
